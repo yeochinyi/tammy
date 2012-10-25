@@ -1,25 +1,42 @@
 package org.moomoocow.tammy.marketdata;
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.annotations.Unique;
+import javax.jdo.annotations.Version;
+import javax.jdo.annotations.VersionStrategy;
 
 @PersistenceCapable
+@Version(strategy=VersionStrategy.VERSION_NUMBER, column="VERSION")
 public class Stock
 {
     @PrimaryKey
     @Persistent(valueStrategy=IdGeneratorStrategy.INCREMENT)
     private long id;
         
-    @Unique
+    public Set<DailyData> getDailyData() {
+		return dailyData;
+	}
+
+	public void setDailyData(Set<DailyData> dailyData) {
+		this.dailyData = dailyData;
+	}
+
+	@Unique
     private String code;
     
     private String desc;
     
-    private boolean active;
+    private boolean active;    
     
     private Exchange exchange;
+    
+	@Persistent(mappedBy="stock")
+	private Set<DailyData>	dailyData;
 
     
 
@@ -29,6 +46,7 @@ public class Stock
 		this.desc = desc;
 		this.active = active;
 		this.exchange = exchange;
+		this.dailyData = new HashSet<DailyData>();
 	}
 
 	@Override

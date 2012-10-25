@@ -4,6 +4,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Transaction;
 
+import org.moomoocow.tammy.marketdata.DailyData;
 import org.moomoocow.tammy.marketdata.Exchange;
 import org.moomoocow.tammy.marketdata.Stock;
 
@@ -22,11 +23,11 @@ public class Main {
 		
 	    tx.begin();
 	    
-	    Exchange e = new Exchange("SI","SGX");
-	    Stock s = new Stock("TEST","Test",true,e);
+	    //Exchange e = new Exchange("SI","SGX");
+	    //Stock s = new Stock("TEST","Test",true,e);
 	    //pm.makePersistent(s);
-	    e.getStocks().add(s);
-	    pm.makePersistent(e);
+	    //e.getStocks().add(s);
+	    //pm.makePersistent(e);
 	    
 		    
 		    //Inventory inv = new Inventory("My Inventory123");
@@ -35,13 +36,15 @@ public class Main {
 		    //inv.getProducts().add(product);
 		    	
 		    //pm.makePersistent(inv);
+	    //pm.
+	    //Query q = pm.newQuery("SELECT FROM " + Stock.class.getName() + " WHERE price < 150.00 ORDER BY price ASC");
+	    //List<Product> products = (List<Product>)q.execute();
+
+	    
+	    //DailyData dd = new DailyData(new Date())
 		    
 	    tx.commit();		    				
 		
-		//tx = pm.currentTransaction();
-		try
-		{
-		    tx.begin();
 
 		    //Query q = pm.newQuery("SELECT FROM " + Product.class.getName() + " WHERE price < 150.00 ORDER BY price ASC");
 		    //List<Product> products = (List<Product>)q.execute();
@@ -59,20 +62,9 @@ public class Main {
 		        //... (use the retrieved objects)
 		    //}
 
-		    tx.commit();
-		}
-		finally
-		{
-		    if (tx.isActive())
-		    {
-		        tx.rollback();
-		    }
+	    tx.commit();
 
-		    pm.close();
-		}
-		
-		System.out.println("5");
-		
+	    pm.close();
 	}
 
 }

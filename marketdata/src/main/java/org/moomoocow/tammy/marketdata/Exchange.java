@@ -7,9 +7,12 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.annotations.Unique;
+import javax.jdo.annotations.Version;
+import javax.jdo.annotations.VersionStrategy;
 
 
 @PersistenceCapable
+@Version(strategy=VersionStrategy.VERSION_NUMBER, column="VERSION")
 public class Exchange
 {
 	@PrimaryKey
@@ -23,7 +26,7 @@ public class Exchange
     
 	@Persistent(mappedBy="exchange")
 	private Set<Stock> stocks;
-
+		
 	public Exchange(String code, String desc) {
 		super();
 		this.code = code;
