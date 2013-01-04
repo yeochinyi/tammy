@@ -1,111 +1,108 @@
 package org.moomoocow.tammy.marketdata;
+
 import java.util.Date;
 
+import javax.jdo.annotations.Column;
 import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.Version;
-import javax.jdo.annotations.VersionStrategy;
+import javax.jdo.annotations.Unique;
 
 @PersistenceCapable
-@Version(strategy=VersionStrategy.VERSION_NUMBER, column="VERSION")
-public class DailyData
-{
-    @PrimaryKey        
-    private Date date;
-    
-    @PrimaryKey
-    private Stock stock;
-    
-    private double open;
-    
-    private double high;
-    
-    private double low;
-    
-    private double close;
-    
-    private long vol;
-    
-    private double adjClose;
+// @Version(strategy=VersionStrategy.VERSION_NUMBER, column="VERSION")
+@Unique(name = "STOCK_DATE_IDX", members = { "date", "stock" })
+public class DailyData extends BasePersistData {
 
-	public DailyData(Date date, Stock stock, double open, double high,
-			double low, double close, long vol, double adjClose) {
-		super();
-		this.date = date;
-		this.stock = stock;
-		this.open = open;
-		this.high = high;
-		this.low = low;
-		this.close = close;
-		this.vol = vol;
-		this.adjClose = adjClose;
-	}
+  @Column(jdbcType="DATE")
+  private Date date;
 
-	public Date getDate() {
-		return date;
-	}
+  private Stock stock;
 
-	public void setDate(Date date) {
-		this.date = date;
-	}
+  private Double open;
 
-	public Stock getStock() {
-		return stock;
-	}
+  private Double high;
 
-	public void setStock(Stock stock) {
-		this.stock = stock;
-	}
+  private Double low;
 
-	public double getOpen() {
-		return open;
-	}
+  private Double close;
 
-	public void setOpen(double open) {
-		this.open = open;
-	}
+  private Long vol;
 
-	public double getHigh() {
-		return high;
-	}
+  private Double multipler;
 
-	public void setHigh(double high) {
-		this.high = high;
-	}
+  public DailyData(Date date, Stock stock, Double open, Double high,
+      Double low, Double close, Long vol, Double multipler) {
+    super();
+    this.setDate(date);
+    this.setStock(stock);
+    this.setOpen(open);
+    this.setHigh(high);
+    this.setLow(low);
+    this.setClose(close);
+    this.setVol(vol);
+    this.setMultipler(multipler);
+  }
 
-	public double getLow() {
-		return low;
-	}
+  public void setDate(Date date) {
+    this.date = date;
+  }
 
-	public void setLow(double low) {
-		this.low = low;
-	}
+  public Date getDate() {
+    return date;
+  }
 
-	public double getClose() {
-		return close;
-	}
+  public void setStock(Stock stock) {
+    this.stock = stock;
+  }
 
-	public void setClose(double close) {
-		this.close = close;
-	}
+  public Stock getStock() {
+    return stock;
+  }
 
-	public long getVol() {
-		return vol;
-	}
+  public void setOpen(Double open) {
+    this.open = open;
+  }
 
-	public void setVol(long vol) {
-		this.vol = vol;
-	}
+  public Double getOpen() {
+    return open;
+  }
 
-	public double getAdjClose() {
-		return adjClose;
-	}
+  public void setHigh(Double high) {
+    this.high = high;
+  }
 
-	public void setAdjClose(double adjClose) {
-		this.adjClose = adjClose;
-	}
-        
-    
+  public Double getHigh() {
+    return high;
+  }
 
-    
+  public void setLow(Double low) {
+    this.low = low;
+  }
+
+  public Double getLow() {
+    return low;
+  }
+
+  public void setClose(Double close) {
+    this.close = close;
+  }
+
+  public Double getClose() {
+    return close;
+  }
+
+  public void setVol(Long vol) {
+    this.vol = vol;
+  }
+
+  public Long getVol() {
+    return vol;
+  }
+
+  public void setMultipler(Double multipler) {
+    this.multipler = multipler;
+  }
+
+  public Double getMultipler() {
+    return multipler;
+  }
+
 }
