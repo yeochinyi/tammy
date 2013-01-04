@@ -27,9 +27,9 @@ public class DailyData extends BasePersistData {
   private Long vol;
 
   private Double multipler;
-
+    
   public DailyData(Date date, Stock stock, Double open, Double high,
-      Double low, Double close, Long vol, Double multipler) {
+      Double low, Double close, Long vol) {
     super();
     this.setDate(date);
     this.setStock(stock);
@@ -38,7 +38,6 @@ public class DailyData extends BasePersistData {
     this.setLow(low);
     this.setClose(close);
     this.setVol(vol);
-    this.setMultipler(multipler);
   }
 
   public void setDate(Date date) {
