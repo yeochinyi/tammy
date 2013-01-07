@@ -22,6 +22,7 @@ public abstract class BaseStaticData extends BasePersistData {
   
   protected Integer totalChildren;
   
+
   public BaseStaticData(String code, String description) {
     super();
     this.createdDate = new Date();
@@ -54,5 +55,20 @@ public abstract class BaseStaticData extends BasePersistData {
   public void setModifiedDate(Date modifiedDate) {
     this.modifiedDate = modifiedDate;
   }
+  
+  public Integer getTotalChildren() {
+    return totalChildren;
+  }
+
+  public void setTotalChildren(Integer totalChildren) {
+    this.totalChildren = totalChildren;
+  }
+  
+  public void addTotalChildren(Integer addChildren) {
+    if(this.totalChildren == null) this.totalChildren = 0;
+    this.totalChildren += addChildren;
+  }
+
+
   
 }

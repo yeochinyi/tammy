@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -24,25 +25,30 @@ public class YahooImport {
   
   final private static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
-  public static void main(String[] args) throws IOException {
+  public static void main(String[] args) throws IOException, ParseException {
     YahooImport y = new YahooImport();
-    y.importDailyData();
+    y.importHistoricalData();
 
   }
 
-  public void importDailyData() throws IOException {
+  @SuppressWarnings("unchecked")
+  public void importHistoricalData() throws IOException, ParseException {
     PersistenceManagerFactory pmf = JDOHelper
         .getPersistenceManagerFactory("datanucleus.properties");
     PersistenceManager pm = pmf.getPersistenceManager();
 
-    Query q = pm.newQuery(Stock.class, "this.code == 'Z74.SI'");
+    Query q = pm.newQuery(Stock.class, "this.code == 'Z74.SI'");        
+    //Query q = pm.newQuery(Stock.class, "this.active == true && ");
 
     for (Stock s : (List<Stock>) q.execute()) {
       System.out.println(s.getDescription());
-
-      //Date startDate = new Date(0);
+                 
       Calendar startDate = new GregorianCalendar();
-      startDate.add(Calendar.DATE, -7);
+      
+      HistoricalData lastDD = s.getMaxDatedDailyData();
+            
+      startDate.setTime(lastDD == null ? new Date(0) : lastDD.getDate());
+
       Calendar endDate = new GregorianCalendar();
 
       String datesParam = constructDateParams(DATE_START_PARAMS, startDate) +
@@ -66,12 +72,15 @@ public class YahooImport {
       2012-12-28,3.31,3.33,3.31,3.33,11723000,3.33
       */
       
-      //reading heading
+      //Read heading
       r.readLine();
       
-      DailyData lastDD;
+      HistoricalData prevDD = null;
       
-      Double lastCloseDivAdj;
+      Date lastHistoricalDate = null;
+            
+      int filecount = 0;
+      boolean hasMultipler = false;
       
       while((text = r.readLine()) != null){
         System.out.println(text);
@@ -79,22 +88,59 @@ public class YahooImport {
         String[] t = text.split(",");
                         
         Date d = df.parse(t[0]);
+        
+        if(filecount == 0){          
+          if(lastDD != null && d.equals(lastDD.getDate())){
+            System.out.println("No new data as first date is equal db max.");
+            break;
+          }
+          else{
+            lastHistoricalDate = d;
+          }
+        }
+        
         Double open = Double.valueOf(t[1]);
         Double high = Double.valueOf(t[2]);
         Double low = Double.valueOf(t[3]);
         Double close = Double.valueOf(t[4]);
         Long vol = Long.valueOf(t[5]);
-        Double adj = Double.valueOf(t[6]);
-        
-        Double closeDivAdj = close/adj;
+        Double adjustedClose = Double.valueOf(t[6]);        
                 
-        lastDD = new DailyData(d,s,open,high,low,close,vol,m);
+        HistoricalData currDD = new HistoricalData(d,s,open,high,low,close,vol,adjustedClose);
         
+        //Date  Open  High  Low Close Volume,  Adj Close,   C / Adj C, T+1 / T, Filter >, ABS(x-1)          
+        //5/12/2004 26.81 27.18 25.76 27.08 26108100  27.08 1.0000  2.000373692 2.000373692   1.00037
+        //5/11/2004 52.35 54  52.18 53.53 34553400  26.76   0.4999  0.999813189               0.00019
+       
+        if(prevDD != null){          
+          Double multipler =  prevDD.getCloseMultipler() / currDD.getCloseMultipler();
+          if(Math.abs(multipler - 1) > 0.03){
+            prevDD.setMultipler(multipler);
+            hasMultipler = true;
+          }
+          
+          pm.makePersistent(prevDD);
+          
+        }
         
+        filecount++;
+        
+        prevDD = currDD;        
       }
       
+      //Save the last DD
+      if(lastDD == null)
+        pm.makePersistent(prevDD);
+      
+      if(filecount != 0){
+        if(hasMultipler) s.setPriceMultiplied(true);
+        s.addTotalChildren(filecount - 1);
+        if(lastHistoricalDate != null) s.setLastHistoricalDate(lastHistoricalDate);
+        pm.makePersistent(s);
+      }
     }
-
+    
+    
   }
 
   public String constructDateParams(String names, Calendar c) {
