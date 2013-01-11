@@ -4,7 +4,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Transaction;
 
-import org.moomoocow.tammy.marketdata.HistoricalData;
+import org.moomoocow.tammy.marketdata.StockHistoricalData;
 import org.moomoocow.tammy.marketdata.Exchange;
 import org.moomoocow.tammy.marketdata.Stock;
 

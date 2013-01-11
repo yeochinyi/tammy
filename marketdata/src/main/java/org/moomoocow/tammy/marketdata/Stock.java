@@ -19,15 +19,26 @@ public class Stock extends BaseStaticData {
   @Column(jdbcType="DATE")
   private Date lastHistoricalDate;
 
+  private Integer totalHistorialData;
+  
   @Persistent(mappedBy = "stock")
-  private Set<HistoricalData> dailyData;
+  private Set<StockHistoricalData> dailyData;
+  
+  
+  @Column(jdbcType="DATE")
+  private Date lastSnapshotDate;
+  
+  private Integer totalSnapshotData;
+
+  @Persistent(mappedBy = "stock")
+  private Set<StockSnapshotData> snapshotData;
 
   public Stock(String code, String desc, Exchange exchange) {
     
     super(code,desc);
     
     this.exchange = exchange;
-    this.dailyData = new HashSet<HistoricalData>();
+    this.dailyData = new HashSet<StockHistoricalData>();
   }
 
   public Exchange getExchange() {
@@ -38,11 +49,11 @@ public class Stock extends BaseStaticData {
     this.exchange = exchange;
   }
 
-  public Set<HistoricalData> getDailyData() {
+  public Set<StockHistoricalData> getDailyData() {
     return dailyData;
   }
 
-  public void setDailyData(Set<HistoricalData> dailyData) {
+  public void setDailyData(Set<StockHistoricalData> dailyData) {
     this.dailyData = dailyData;
   }
 
@@ -54,11 +65,11 @@ public class Stock extends BaseStaticData {
     return priceMultiplied;
   }
   
-  public HistoricalData getMaxDatedDailyData(){
+  public StockHistoricalData getMaxDatedDailyData(){
     
-    HistoricalData max = null;
+    StockHistoricalData max = null;
     
-    for (HistoricalData dd : this.getDailyData()) {
+    for (StockHistoricalData dd : this.getDailyData()) {
       if(max == null || dd.getDate().after(max.getDate())) 
         max = dd;
     }
@@ -71,6 +82,42 @@ public class Stock extends BaseStaticData {
   }
 
   public Date getLastHistoricalData() {
+    return lastHistoricalDate;
+  }
+
+  public Integer getTotalHistorialData() {
+    return totalHistorialData;
+  }
+
+  public Integer addTotalHistorialData(Integer totalHistorialData) {
+    return (this.totalHistorialData == null ? 0 :  this.totalHistorialData) +  totalHistorialData;
+  }
+
+  public Date getLastSnapshotDate() {
+    return lastSnapshotDate;
+  }
+
+  public void setLastSnapshotDate(Date lastSnapshotDate) {
+    this.lastSnapshotDate = lastSnapshotDate;
+  }
+
+  public Integer getTotalSnapshotData() {
+    return totalSnapshotData;
+  }
+
+  public Integer addTotalSnapshotData(Integer totalSnapshotData) {
+    return (this.totalSnapshotData == null ? 0 :  this.totalSnapshotData) +  totalSnapshotData;
+  }
+
+  public Set<StockSnapshotData> getSnapshotData() {
+    return snapshotData;
+  }
+
+  public void setSnapshotData(Set<StockSnapshotData> snapshotData) {
+    this.snapshotData = snapshotData;
+  }
+
+  public Date getLastHistoricalDate() {
     return lastHistoricalDate;
   }
 

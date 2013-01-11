@@ -106,7 +106,7 @@ public class EODDataImport {
   }
 
   @SuppressWarnings("unchecked")
-  public void createDefaultExchanges() {
+  private void createDefaultExchanges() {
     
     Query q = pm.newQuery(Exchange.class);
     

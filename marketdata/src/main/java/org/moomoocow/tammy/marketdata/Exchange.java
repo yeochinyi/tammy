@@ -12,6 +12,8 @@ public class Exchange extends BaseStaticData {
 
   @Persistent(mappedBy = "exchange")
   private Set<Stock> stocks;
+  
+  private Integer totalStocks;
 
   public Exchange(String code, String desc) {
     super(code, desc);
@@ -25,6 +27,14 @@ public class Exchange extends BaseStaticData {
 
   public void setStocks(Set<Stock> stocks) {
     this.stocks = stocks;
+  }
+
+  public Integer addTotalStocks(Integer totalStocks) {
+    return (this.totalStocks == null ? 0 :  this.totalStocks) +  totalStocks;    
+  }
+
+  public Integer getTotalStocks() {
+    return totalStocks;
   }
 
 }

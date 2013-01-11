@@ -10,7 +10,7 @@ import javax.jdo.annotations.Unique;
 @PersistenceCapable
 // @Version(strategy=VersionStrategy.VERSION_NUMBER, column="VERSION")
 @Unique(name = "STOCK_DATE_IDX", members = { "date", "stock" })
-public class HistoricalData extends BasePersistData {
+public class StockHistoricalData extends BasePersistData {
 
   @Column(jdbcType="DATE")
   private Date date;
@@ -32,7 +32,7 @@ public class HistoricalData extends BasePersistData {
   @NotPersistent
   private Double adjustedClose;
     
-  public HistoricalData(Date date, Stock stock, Double open, Double high,
+  public StockHistoricalData(Date date, Stock stock, Double open, Double high,
       Double low, Double close, Long vol, Double adjustedClose) {
     super();
     this.setDate(date);
