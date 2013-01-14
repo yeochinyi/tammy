@@ -2,7 +2,6 @@ package org.moomoocow.tammy.marketdata;
 
 import java.lang.reflect.Field;
 import java.math.BigInteger;
-import java.sql.Time;
 import java.util.Date;
 
 import javax.jdo.annotations.Column;
@@ -12,15 +11,19 @@ import javax.jdo.annotations.PersistenceCapable;
 @PersistenceCapable
 public class StockSnapshotData extends BasePersistData {
     
-  public void copyNonNullFields(StockSnapshotData copyFrom){
+  public static void copyNonNullFields(StockSnapshotData from,StockSnapshotData to){
     
-    if(copyFrom == null) return;
+    if(from == null || to == null) return;
     
     for (Field f : StockSnapshotData.class.getDeclaredFields()) {      
+      
+      YahooData annotation = f.getAnnotation(YahooData.class);
+      if(annotation == null) continue;
+      
       try {
-        Object v = f.get(copyFrom);
+        Object v = f.get(from);
         if(v==null) continue;
-        f.set(this, v);
+        f.set(to, v);
       } catch (IllegalArgumentException e) {
         e.printStackTrace();
       } catch (IllegalAccessException e) {

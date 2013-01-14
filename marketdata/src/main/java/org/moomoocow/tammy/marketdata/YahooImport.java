@@ -41,7 +41,8 @@ public class YahooImport {
 
   public static void main(String[] args) throws IOException, ParseException {
     YahooImport y = new YahooImport();
-    y.importAll();
+    y.importData(true);
+
   }
 
   public YahooImport() {
@@ -58,28 +59,35 @@ public class YahooImport {
   }
 
   @SuppressWarnings("unchecked")
-  public void importAll() throws IOException {
+  public void importData(boolean importHistoricalData) throws IOException {
     // Query q = pm.newQuery(Stock.class, "this.code == 'Z74.SI'");
     Query q = pm.newQuery(Stock.class,
         "this.active == true || this.active == null");
 
     List<Stock> stocks = (List<Stock>) q.execute();
 
-    System.out.println("ImportAll for " + stocks.size() + " stocks.");
+    // System.out.println("ImportAll for " + stocks.size() + " stocks.");
 
-    List<Stock> batch = new ArrayList<Stock>();
-
-    for (Stock s : stocks) {
-      batch.add(s);
-      if (batch.size() == 100) {
-        importSnapshotData(batch);
-        batch.clear();
+    if (importHistoricalData) {
+      for (Stock s : stocks) {
+        importHistoricalData(s);
       }
-    }
+    } else {
 
-    // Import rest
-    if (batch.size() > 0)
-      importSnapshotData(batch);
+      List<Stock> batch = new ArrayList<Stock>();
+
+      for (Stock s : stocks) {
+        batch.add(s);
+        if (batch.size() == 100) {
+          importSnapshotData(batch);
+          batch.clear();
+        }
+      }
+
+      // Import rest
+      if (batch.size() > 0)
+        importSnapshotData(batch);
+    }
 
   }
 
@@ -137,12 +145,12 @@ public class YahooImport {
       StockSnapshotData ssd2 = ssdMap2.get(s.code);
 
       if (ssd1 != null) {
-        ssd1.copyNonNullFields(ssd2);
+        StockSnapshotData.copyNonNullFields(ssd1, ssd2);
         ssd1.setStock(s);
       }
 
       pm.makePersistent(ssd1);
-      s.addTotalHistorialData(1);
+      s.addTotalSnapshotData(1);
       s.setLastSnapshotDate(new Date());
       pm.makePersistent(s);
     }
@@ -221,14 +229,14 @@ public class YahooImport {
         Object v = null;
 
         if (value.equals("N/A") || value.equals(""))
-          value = null;        
+          value = null;
         else if (c.equals(Date.class) || c.equals(Time.class)) {
           // value = value.replaceAll("-"," ");
           try {
             v = Chronic.parse(value).getEndCalendar().getTime();
           } catch (Exception e) {
-            System.out.println("Can't parse '" + value + "' to Date/Time");           
-            //e.printStackTrace();
+            System.out.println("Can't parse '" + value + "' to Date/Time");
+            // e.printStackTrace();
 
           }
         } else if (c.equals(String.class)) {
@@ -239,7 +247,7 @@ public class YahooImport {
             v = Double.parseDouble(value);
           } catch (Exception e) {
             System.out.println("Can't parse '" + value + "' to Double");
-            //e.printStackTrace();
+            // e.printStackTrace();
           }
         } else if (c.equals(BigInteger.class)) {
           try {
@@ -254,7 +262,7 @@ public class YahooImport {
             }
           } catch (Exception e) {
             System.out.println("Can't parse '" + value + "' to BigInt");
-            //e.printStackTrace();
+            // e.printStackTrace();
 
           }
         } else {
@@ -262,7 +270,7 @@ public class YahooImport {
             v = Long.parseLong(value);
           } catch (NumberFormatException e) {
             System.out.println("Can't parse '" + value + "' to Long");
-            //e.printStackTrace();
+            // e.printStackTrace();
           }
         }
 
@@ -286,7 +294,7 @@ public class YahooImport {
 
   }
 
-  public void importHistoricalData(Stock s) throws IOException, ParseException {
+  public void importHistoricalData(Stock s){
 
     System.out.println(s.getDescription());
 
@@ -306,10 +314,17 @@ public class YahooImport {
 
     System.out.println("URL=" + url);
 
-    BufferedReader r = new BufferedReader(new InputStreamReader(
-        new URL(url).openStream()));
-
-    String text;
+    BufferedReader r;
+    try {
+      r = new BufferedReader(new InputStreamReader(
+          new URL(url).openStream()));
+    } catch (MalformedURLException e) {
+      e.printStackTrace();
+      return;
+    } catch (IOException e) {
+      e.printStackTrace();
+      return;
+    }
 
     /*
      * File format Date,Open,High,Low,Close,Volume,Adj Close
@@ -321,7 +336,12 @@ public class YahooImport {
      */
 
     // Read heading
-    r.readLine();
+    try {
+      r.readLine();
+    } catch (IOException e1) {
+      e1.printStackTrace();
+      return;
+    }
 
     StockHistoricalData prevDD = null;
 
@@ -330,12 +350,29 @@ public class YahooImport {
     int filecount = 0;
     boolean hasMultipler = false;
 
-    while ((text = r.readLine()) != null) {
+    while (true) {
+      
+      String text = null;
+      try {
+        text = r.readLine();
+      } catch (IOException e1) {
+        e1.printStackTrace();
+        break;
+      }
+      
+      if(text == null) break;
+      
       System.out.println(text);
 
       String[] t = text.split(",");
 
-      Date d = df.parse(t[0]);
+      Date d = null;
+      try {
+        d = df.parse(t[0]);
+      } catch (ParseException e) {
+        e.printStackTrace();
+        continue;
+      }
 
       if (filecount == 0) {
         if (lastDD != null && d.equals(lastDD.getDate())) {

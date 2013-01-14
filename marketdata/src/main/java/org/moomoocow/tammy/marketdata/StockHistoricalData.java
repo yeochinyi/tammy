@@ -10,7 +10,7 @@ import javax.jdo.annotations.Unique;
 @PersistenceCapable
 // @Version(strategy=VersionStrategy.VERSION_NUMBER, column="VERSION")
 @Unique(name = "STOCK_DATE_IDX", members = { "date", "stock" })
-public class StockHistoricalData extends BasePersistData {
+public class StockHistoricalData extends BasePersistData implements Comparable<StockHistoricalData> {
 
   @Column(jdbcType="DATE")
   private Date date;
@@ -120,6 +120,24 @@ public class StockHistoricalData extends BasePersistData {
 
   public Double getAdjustedClose() {
     return adjustedClose;
-  }   
+  }
+
+  @Override
+  public int compareTo(StockHistoricalData o) {      
+    return this.getDate().compareTo(o.getDate());
+  }
+  
+  public Double getMid(){
+    return (getHigh() + getLow()) / 2.0;
+  }
+
+  @Override
+  public String toString() {
+    return "StockHistoricalData [date=" + date + ", open="
+        + open + ", high=" + high + ", low=" + low + ", close=" + close
+        + ", vol=" + vol + ", multipler=" + multipler + "]";
+  }
+  
+  
 
 }

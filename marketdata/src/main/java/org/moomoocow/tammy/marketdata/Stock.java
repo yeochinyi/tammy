@@ -1,8 +1,10 @@
 package org.moomoocow.tammy.marketdata;
 
+import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.PersistenceCapable;
@@ -24,7 +26,6 @@ public class Stock extends BaseStaticData {
   @Persistent(mappedBy = "stock")
   private Set<StockHistoricalData> dailyData;
   
-  
   @Column(jdbcType="DATE")
   private Date lastSnapshotDate;
   
@@ -33,12 +34,9 @@ public class Stock extends BaseStaticData {
   @Persistent(mappedBy = "stock")
   private Set<StockSnapshotData> snapshotData;
 
-  public Stock(String code, String desc, Exchange exchange) {
-    
-    super(code,desc);
-    
+  public Stock(String code, String desc, Exchange exchange) {    
+    super(code,desc);    
     this.exchange = exchange;
-    this.dailyData = new HashSet<StockHistoricalData>();
   }
 
   public Exchange getExchange() {
@@ -49,8 +47,8 @@ public class Stock extends BaseStaticData {
     this.exchange = exchange;
   }
 
-  public Set<StockHistoricalData> getDailyData() {
-    return dailyData;
+  public Set<StockHistoricalData> getDailyData() {    
+    return this.dailyData;
   }
 
   public void setDailyData(Set<StockHistoricalData> dailyData) {
@@ -64,6 +62,16 @@ public class Stock extends BaseStaticData {
   public Boolean getPriceMultiplied() {
     return priceMultiplied;
   }
+  
+  public Collection<StockHistoricalData> getSortedDailyData() {
+    SortedSet<StockHistoricalData> s = new TreeSet<StockHistoricalData>();
+    for(StockHistoricalData d : getDailyData()){
+      s.add(d);
+    }
+    
+    return s;
+  }
+ 
   
   public StockHistoricalData getMaxDatedDailyData(){
     
@@ -90,7 +98,8 @@ public class Stock extends BaseStaticData {
   }
 
   public Integer addTotalHistorialData(Integer totalHistorialData) {
-    return (this.totalHistorialData == null ? 0 :  this.totalHistorialData) +  totalHistorialData;
+    this.totalHistorialData = (this.totalHistorialData == null ? 0 :  this.totalHistorialData) +  totalHistorialData; 
+    return this.totalHistorialData;
   }
 
   public Date getLastSnapshotDate() {
@@ -106,7 +115,8 @@ public class Stock extends BaseStaticData {
   }
 
   public Integer addTotalSnapshotData(Integer totalSnapshotData) {
-    return (this.totalSnapshotData == null ? 0 :  this.totalSnapshotData) +  totalSnapshotData;
+    this.totalSnapshotData = (this.totalSnapshotData == null ? 0 :  this.totalSnapshotData) +  totalSnapshotData;
+    return  this.totalSnapshotData;
   }
 
   public Set<StockSnapshotData> getSnapshotData() {

@@ -12,7 +12,7 @@ public class Exchange extends BaseStaticData {
 
   @Persistent(mappedBy = "exchange")
   private Set<Stock> stocks;
-  
+
   private Integer totalStocks;
 
   public Exchange(String code, String desc) {
@@ -30,7 +30,9 @@ public class Exchange extends BaseStaticData {
   }
 
   public Integer addTotalStocks(Integer totalStocks) {
-    return (this.totalStocks == null ? 0 :  this.totalStocks) +  totalStocks;    
+    this.totalStocks = (this.totalStocks == null ? 0 : this.totalStocks)
+        + totalStocks;
+    return this.totalStocks;
   }
 
   public Integer getTotalStocks() {
