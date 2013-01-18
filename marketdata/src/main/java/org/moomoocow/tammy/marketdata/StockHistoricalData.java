@@ -1,6 +1,8 @@
 package org.moomoocow.tammy.marketdata;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.NotPersistent;
@@ -12,6 +14,8 @@ import javax.jdo.annotations.Unique;
 @Unique(name = "STOCK_DATE_IDX", members = { "date", "stock" })
 public class StockHistoricalData extends BasePersistData implements Comparable<StockHistoricalData> {
 
+  public enum Price {OPEN,HIGH,LOW,CLOSE,MID};
+  
   @Column(jdbcType="DATE")
   private Date date;
 
@@ -70,33 +74,34 @@ public class StockHistoricalData extends BasePersistData implements Comparable<S
     this.open = open;
   }
 
-  public Double getOpen() {
-    return open;
-  }
-
   public void setHigh(Double high) {
     this.high = high;
   }
+  
+  public Double getOpen() {
+    return open;
+  }
+  public Double getClose() {
+    return close;
+  }
+
 
   public Double getHigh() {
     return high;
+  }
+  public Double getLow() {
+    return low;
   }
 
   public void setLow(Double low) {
     this.low = low;
   }
 
-  public Double getLow() {
-    return low;
-  }
 
   public void setClose(Double close) {
     this.close = close;
   }
 
-  public Double getClose() {
-    return close;
-  }
 
   public void setVol(Long vol) {
     this.vol = vol;
@@ -137,6 +142,48 @@ public class StockHistoricalData extends BasePersistData implements Comparable<S
         + open + ", high=" + high + ", low=" + low + ", close=" + close
         + ", vol=" + vol + ", multipler=" + multipler + "]";
   }
+  
+  //private Double accumlatedMultipler = 1.0;
+  
+  private Map<Price,Double> accXPrices;
+  
+  public Double accumlateMultiplers(Double prevAccX){    
+    Double m = (prevAccX == null ? 1.0 : prevAccX) * 
+      (this.multipler == null ? 1.0 : this.multipler);
+        
+    accXPrices = new HashMap<Price,Double>();
+    accXPrices.put(Price.OPEN, m * getOpen());
+    accXPrices.put(Price.CLOSE, m * getClose());
+    accXPrices.put(Price.HIGH, m * getHigh());
+    accXPrices.put(Price.LOW, m * getLow());
+    accXPrices.put(Price.MID, m * getMid());
+    
+    return m;    
+  }  
+  
+  public Double getAccX(Price p){
+    return accXPrices.get(p);
+  }
+  
+  /*
+  public Double getAccXOpen() {
+    return getOpen() * accumlatedMultipler;
+  }
+  public Double getAccXClose() {
+    return getClose() * accumlatedMultipler;
+  }
+
+  public Double getAccXHigh() {
+    return getHigh() * accumlatedMultipler;
+  }
+  public Double getAccXLow() {
+    return getLow() * accumlatedMultipler;
+  }
+  public Double getAccXMid() {
+    return getMid() * accumlatedMultipler;
+  }
+  */
+
   
   
 

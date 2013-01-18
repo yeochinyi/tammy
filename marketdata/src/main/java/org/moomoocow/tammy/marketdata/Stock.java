@@ -1,10 +1,10 @@
 package org.moomoocow.tammy.marketdata;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.PersistenceCapable;
@@ -63,12 +63,9 @@ public class Stock extends BaseStaticData {
     return priceMultiplied;
   }
   
-  public Collection<StockHistoricalData> getSortedDailyData() {
-    SortedSet<StockHistoricalData> s = new TreeSet<StockHistoricalData>();
-    for(StockHistoricalData d : getDailyData()){
-      s.add(d);
-    }
-    
+  public List<StockHistoricalData> getSortedDailyData() {    
+    List<StockHistoricalData> s = new ArrayList<StockHistoricalData>(getDailyData());
+    Collections.sort(s);    
     return s;
   }
  
