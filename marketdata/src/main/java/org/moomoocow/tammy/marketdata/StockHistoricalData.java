@@ -32,12 +32,13 @@ public class StockHistoricalData extends BasePersistData implements Comparable<S
   private Long vol;
 
   private Double multipler;
-
-  @NotPersistent
+  
   private Double adjustedClose;
+  
+  private Double dividend;
     
   public StockHistoricalData(Date date, Stock stock, Double open, Double high,
-      Double low, Double close, Long vol, Double adjustedClose) {
+      Double low, Double close, Long vol, Double adjustedClose, Double dividend) {
     super();
     this.setDate(date);
     this.setStock(stock);
@@ -47,6 +48,7 @@ public class StockHistoricalData extends BasePersistData implements Comparable<S
     this.setClose(close);
     this.setVol(vol);
     this.setAdjustedClose(adjustedClose);
+    this.setDividend(dividend);
   }
   
   public Double getCloseMultipler(){
@@ -111,6 +113,14 @@ public class StockHistoricalData extends BasePersistData implements Comparable<S
     return vol;
   }
 
+  public void setDividend(Double dividend) {
+    this.dividend = dividend;
+  }
+
+  public Double getDividend() {
+    return dividend;
+  }
+
   public void setMultipler(Double multipler) {
     this.multipler = multipler;
   }
@@ -142,9 +152,8 @@ public class StockHistoricalData extends BasePersistData implements Comparable<S
         + open + ", high=" + high + ", low=" + low + ", close=" + close
         + ", vol=" + vol + ", multipler=" + multipler + "]";
   }
-  
-  //private Double accumlatedMultipler = 1.0;
-  
+    
+  @NotPersistent
   private Map<Price,Double> accXPrices;
   
   public Double accumlateMultiplers(Double prevAccX){    
@@ -161,30 +170,10 @@ public class StockHistoricalData extends BasePersistData implements Comparable<S
     return m;    
   }  
   
-  public Double getAccX(Price p){
+  public Double getAccX(Price p){    
     return accXPrices.get(p);
   }
-  
-  /*
-  public Double getAccXOpen() {
-    return getOpen() * accumlatedMultipler;
-  }
-  public Double getAccXClose() {
-    return getClose() * accumlatedMultipler;
-  }
-
-  public Double getAccXHigh() {
-    return getHigh() * accumlatedMultipler;
-  }
-  public Double getAccXLow() {
-    return getLow() * accumlatedMultipler;
-  }
-  public Double getAccXMid() {
-    return getMid() * accumlatedMultipler;
-  }
-  */
-
-  
+    
   
 
 }

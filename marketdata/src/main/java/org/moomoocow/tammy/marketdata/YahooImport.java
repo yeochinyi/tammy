@@ -309,18 +309,70 @@ public class YahooImport {
     String datesParam = constructDateParams(DATE_START_PARAMS, startDate)
         + constructDateParams(DATE_END_PARAMS, endDate);
 
+    Map<Date,Double> dividendMap = new HashMap<Date,Double>();
+    
+    //Get dividend data
+    //http://ichart.finance.yahoo.com/table.csv?s=Z74.SI&a=10&b=5&c=2004&d=00&e=22&f=2013&g=v&ignore=.csv
+    
     String url = "http://ichart.finance.yahoo.com/table.csv?" + datesParam
+    + "g=v&s=" + s.getCode();
+    
+    System.out.println("Dividend URL=" + url);
+    
+    BufferedReader r = null;
+
+      try {
+        r = new BufferedReader(new InputStreamReader(
+            new URL(url).openStream()));        
+        r.readLine();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    
+    //Date  Dividends
+    //8/6/2012  0.09
+    // Read heading
+    
+    while (true) {
+      
+      String text = null;
+      try {
+        text = r.readLine();
+      } catch (IOException e1) {
+        e1.printStackTrace();
+        break;
+      }
+      
+      if(text == null) break;
+      
+      System.out.println(text);
+
+      String[] t = text.split(",");
+
+      Date d = null;
+      try {
+        d = df.parse(t[0]);
+      } catch (ParseException e) {
+        e.printStackTrace();
+        continue;
+      }
+      
+      dividendMap.put(d, Double.valueOf(t[1]));
+    }
+    
+    System.out.println("DividendMap Size=" + dividendMap.size());
+    
+
+    //Get daily data
+    url = "http://ichart.finance.yahoo.com/table.csv?" + datesParam
         + "g=d&s=" + s.getCode();
 
-    System.out.println("URL=" + url);
+    System.out.println("Daily URL=" + url);
 
-    BufferedReader r;
     try {
       r = new BufferedReader(new InputStreamReader(
           new URL(url).openStream()));
-    } catch (MalformedURLException e) {
-      e.printStackTrace();
-      return;
+      r.readLine();
     } catch (IOException e) {
       e.printStackTrace();
       return;
@@ -335,16 +387,7 @@ public class YahooImport {
      * 2012-12-28,3.31,3.33,3.31,3.33,11723000,3.33
      */
 
-    // Read heading
-    try {
-      r.readLine();
-    } catch (IOException e1) {
-      e1.printStackTrace();
-      return;
-    }
-
     StockHistoricalData prevDD = null;
-
     Date lastHistoricalDate = null;
 
     int filecount = 0;
@@ -389,9 +432,10 @@ public class YahooImport {
       Double close = Double.valueOf(t[4]);
       Long vol = Long.valueOf(t[5]);
       Double adjustedClose = Double.valueOf(t[6]);
+      Double dividend = dividendMap.get(d);
 
       StockHistoricalData currDD = new StockHistoricalData(d, s, open, high,
-          low, close, vol, adjustedClose);
+          low, close, vol, adjustedClose,dividend);
 
       // Date Open High Low Close Volume, Adj Close, C / Adj C, T+1 / T, Filter
       // >, ABS(x-1)
@@ -403,7 +447,7 @@ public class YahooImport {
       if (prevDD != null) {
         Double multipler = prevDD.getCloseMultipler()
             / currDD.getCloseMultipler();
-        if (Math.abs(multipler - 1) > 0.03) {
+        if (Math.abs(multipler - 1) > 0.01) {
           prevDD.setMultipler(multipler);
           hasMultipler = true;
         }
