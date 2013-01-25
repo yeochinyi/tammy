@@ -1,18 +1,31 @@
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.moomoocow.tammy</groupId>
 	<artifactId>tammy-root</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>tammy</name>
 	<packaging>pom</packaging>
-	
+
 	<modules>
+		<module>model</module>
 		<module>marketdata</module>
 		<module>analysis</module>
 	</modules>
 
-	
+	<profiles>
+		<profile>
+			<id>default</id>
+			<properties>
+				<env>dev</env>
+			</properties>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>		
+		</profile>
+	</profiles>
+
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -22,26 +35,32 @@
 					<configuration>
 						<source>1.6</source>
 						<target>1.6</target>
-						<executable>${JAVA_1_6_HOME}/bin/javac</executable>
+						<!--executable>${JAVA_1_6_HOME}/bin/javac</executable -->
 						<fork>true</fork>
 					</configuration>
-				</plugin>	  							
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
-	
+
 	<dependencies>
-		
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.10</version>
-			<!-- scope>test</scope -->
-		</dependency>				
+			<scope>test</scope>
+		</dependency>
 
-	
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.17</version>
+		</dependency>
+
+
 	</dependencies>
-	
+
 	<distributionManagement>
 		<repository>
 			<id>releases</id>
@@ -52,7 +71,7 @@
 			<url>dav:http://app.moomoocow.info/nexus/content/repositories/snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
-	
+
 	<scm>
 		<connection>scm:git:https://github.com/yeochinyi/tammy.git</connection>
 		<developerConnection>scm:git:https://github.com/yeochinyi/tammy.git</developerConnection>

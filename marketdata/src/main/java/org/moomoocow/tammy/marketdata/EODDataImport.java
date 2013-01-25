@@ -1,18 +1,21 @@
 package org.moomoocow.tammy.marketdata;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.List;
 
-import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
-import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
 
+import org.apache.log4j.Logger;
+import org.moomoocow.tammy.model.Exchange;
+import org.moomoocow.tammy.model.Helper;
+import org.moomoocow.tammy.model.Stock;
 import org.xml.sax.SAXException;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
@@ -21,37 +24,48 @@ import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 public class EODDataImport {
+  
+  private final static Logger log = Logger.getLogger(EODDataImport.class);
 
   private PersistenceManager pm;
 
   public EODDataImport() {
-    PersistenceManagerFactory pmf = JDOHelper
-    .getPersistenceManagerFactory("datanucleus.properties");
-    pm = pmf.getPersistenceManager();
-
+    this.pm = Helper.SINGLETON.getPersistenceManager();
   }
 
-  public static void main(String[] args) throws IOException, SAXException {
-    EODDataImport main = new EODDataImport();    
-    main.createDefaultExchanges();
-    main.fakeImportEODStocks();
-  }
+  //public static void main(String[] args) throws IOException, SAXException {
+    //EODDataImport main = new EODDataImport();    
+    //main.createDefaultExchanges();
+    //main.fakeImportEODStocks();
+  //}
   
   @SuppressWarnings("unchecked")
-  public void fakeImportEODStocks() throws IOException{
+  public void importEODStocksFromFiles(){
     
-    Query q = pm.newQuery(Exchange.class, "this.code == 'SGX'");
+    //Query q = pm.newQuery(Exchange.class, "this.code == 'SGX'");
+    Query q = pm.newQuery(Exchange.class);
 
     for (Exchange e : (List<Exchange>) q.execute()) {
-      System.out.println(e.getCode());
+      log.info("importEODStocksFromFiles for " + e.getCode());
+            
+      String file = e.getCode() + ".txt";
       
-      BufferedReader r = new BufferedReader(new FileReader("C:/Downloads/" + e.getCode() + ".txt"));
-      String t;
-      while((t = r.readLine()) != null){
-        if(t.startsWith("Symbol")) continue;
-        String[] texts  = t.split("\t");        
-          Stock s = new Stock(texts[0],texts[1],e);
-          pm.makePersistent(s);        
+      InputStream is = EODDataImport.class.getResourceAsStream(file);
+      if(is == null){
+        log.warn(e.getCode() + " file not found.");
+        continue;
+      }
+      BufferedReader r = new BufferedReader(new InputStreamReader(is));
+      String t = null;
+      try {
+        while((t = r.readLine()) != null){
+          if(t.startsWith("Symbol")) continue;
+          String[] texts  = t.split("\t");        
+            Stock s = new Stock(texts[0],texts[1],e);
+            pm.makePersistent(s);        
+        }
+      } catch (IOException e1) {
+        log.error("Can't persist : " + t);
       }
     }
 
@@ -106,13 +120,16 @@ public class EODDataImport {
   }
 
   @SuppressWarnings("unchecked")
-  private void createDefaultExchanges() {
+  public void makeExchanges() {
     
     Query q = pm.newQuery(Exchange.class);
     
     List<Exchange> list = (List<Exchange>) q.execute();
     
-    if(list.size() != 0) return;
+    if(list.size() != 0){
+      log.warn("Exchange is already populated!");
+      return;
+    }
     
         
     String[] exchanges = { "AMS", "Euronext Amsterdam", "ASX",
@@ -132,17 +149,11 @@ public class EODDataImport {
         "Toronto Venture Exchange", "USMF", "Mutual Funds", "WCE",
         "Winnipeg Commodity Exchange", };
 
-    for (int i = 0; i < exchanges.length; i += 2) {
+    for (int i = 0; i < exchanges.length; i += 2) {            
+      
       Exchange e = new Exchange(exchanges[i], exchanges[i + 1]);
       pm.makePersistent(e);
     }
-
-    /*
-    Query q = pm.newQuery(Exchange.class, "this.active == true");
-
-    for (Exchange e : (List<Exchange>) q.execute()) {
-      System.out.println(e.getCode());
-    }*/
 
   }
 

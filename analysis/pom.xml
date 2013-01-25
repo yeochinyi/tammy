@@ -21,9 +21,9 @@
   
   <dependencies>
 		<dependency>
-			<groupId>${project.groupId}</groupId>
+			<groupId>${groupId}</groupId>
 			<artifactId>marketdata</artifactId>
-			<version>${project.version}</version>
+			<version>${version}</version>
 		</dependency>	
   
   </dependencies>
