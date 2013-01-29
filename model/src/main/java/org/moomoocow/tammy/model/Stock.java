@@ -9,8 +9,10 @@ import java.util.Set;
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Unique;
 
 @PersistenceCapable
+@Unique(members={"exchange","code"})
 // @Version(strategy=VersionStrategy.DATE_TIME, column="TIMESTAMP")
 public class Stock extends BaseStaticData {
 

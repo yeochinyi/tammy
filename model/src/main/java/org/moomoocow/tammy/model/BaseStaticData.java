@@ -11,7 +11,6 @@ import javax.jdo.annotations.Unique;
 @Inheritance(strategy = InheritanceStrategy.SUBCLASS_TABLE)
 public abstract class BaseStaticData extends BasePersistData {
     
-  @Unique
   protected String code;
   
   protected String description;

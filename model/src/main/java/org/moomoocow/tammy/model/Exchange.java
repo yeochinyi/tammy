@@ -5,8 +5,10 @@ import java.util.Set;
 
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Unique;
 
 @PersistenceCapable
+@Unique(members={"code"})
 // @Version(strategy=VersionStrategy.VERSION_NUMBER, column="VERSION")
 public class Exchange extends BaseStaticData {
 
