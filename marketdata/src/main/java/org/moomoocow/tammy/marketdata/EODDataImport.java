@@ -74,11 +74,11 @@ public class EODDataImport {
             pm.makePersistent(s);
             added++;
           } catch (JDODataStoreException e2) {
-            log.error("Can't persist " + t, e2);
+            log.error("Can't persist " + t + " due to " + e2.getMessage());
           }
         }
       } catch (IOException e1) {
-        log.error("Can't read from from : " + file, e1);
+        log.error("Can't read from from : " + file + " due to " + e1.getMessage());
       }
 
       if (added != 0) {
@@ -87,7 +87,7 @@ public class EODDataImport {
         try {
           pm.makePersistent(e);
         } catch (JDODataStoreException e2) {
-          log.error("Can't persist " + e, e2);
+          log.error("Can't persist " + t + " due to " + e2.getMessage());
         }
       }
     }
@@ -175,7 +175,7 @@ public class EODDataImport {
       try {
         pm.makePersistent(e);
       } catch (JDODataStoreException e2) {
-        log.error("Can't persist " + e, e2);
+        log.error("Can't persist " + e.getCode() + " due to " + e2.getMessage());
       }
     }
   }
