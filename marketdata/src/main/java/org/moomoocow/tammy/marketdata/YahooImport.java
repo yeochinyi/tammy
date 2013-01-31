@@ -191,9 +191,8 @@ public class YahooImport {
     try {
       r = new BufferedReader(new InputStreamReader(
           new URL(url).openStream()));
-    } catch (IOException e1) {
-      // TODO Auto-generated catch block
-      e1.printStackTrace();
+    } catch (IOException e) {
+      logger.warn("Can't get stock data",e);
     }
 
     String text;
@@ -262,7 +261,6 @@ public class YahooImport {
               v = Chronic.parse(value).getEndCalendar().getTime();
             } catch (Exception e) {
               logger.info("Can't parse '" + value + "' to Date/Time");
-              // e.printStackTrace();
 
             }
           } else if (c.equals(String.class)) {
@@ -273,7 +271,6 @@ public class YahooImport {
               v = Double.parseDouble(value);
             } catch (Exception e) {
               logger.info("Can't parse '" + value + "' to Double");
-              // e.printStackTrace();
             }
           } else if (c.equals(BigInteger.class)) {
             try {
@@ -288,15 +285,12 @@ public class YahooImport {
               }
             } catch (Exception e) {
               logger.info("Can't parse '" + value + "' to BigInt");
-              // e.printStackTrace();
-
             }
           } else {
             try {
               v = Long.parseLong(value);
             } catch (NumberFormatException e) {
               logger.info("Can't parse '" + value + "' to Long");
-              // e.printStackTrace();
             }
           }
 
@@ -304,10 +298,10 @@ public class YahooImport {
             // StockSnapshotData d = ssData.get(index);
             try {
               f.set(ssData, v);
-            } catch (IllegalArgumentException e) {
-              e.printStackTrace();
+            } catch (IllegalArgumentException e) {              
+              logger.warn("Can't set value ", e);
             } catch (IllegalAccessException e) {
-              e.printStackTrace();
+              logger.warn("Can't set value ", e);
             }
           }
         }
@@ -316,10 +310,8 @@ public class YahooImport {
         map.put(ssData.getSymbol(), ssData);
       }
     } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      logger.warn("Can't put value ", e);
     }
-
     return map;
 
   }
@@ -354,8 +346,8 @@ public class YahooImport {
     try {
       r = new BufferedReader(new InputStreamReader(new URL(url).openStream()));
       r.readLine();
-    } catch (IOException e) {
-      e.printStackTrace();
+    } catch (Exception e) {
+      logger.warn("Can't get dividend data",e);
     }
 
     // Date Dividends
@@ -367,8 +359,8 @@ public class YahooImport {
       String text = null;
       try {
         text = r.readLine();
-      } catch (IOException e1) {
-        e1.printStackTrace();
+      } catch (Exception e) {
+        logger.warn("Can't get dividend data",e);
         break;
       }
 
@@ -383,7 +375,7 @@ public class YahooImport {
       try {
         d = df.parse(t[0]);
       } catch (ParseException e) {
-        e.printStackTrace();
+        logger.warn("Can't parse",e);
         continue;
       }
 
@@ -401,8 +393,8 @@ public class YahooImport {
     try {
       r = new BufferedReader(new InputStreamReader(new URL(url).openStream()));
       r.readLine();
-    } catch (IOException e) {
-      e.printStackTrace();
+    } catch (Exception e) {
+      logger.warn("Can't get stock data",e);
       return;
     }
 
@@ -426,8 +418,8 @@ public class YahooImport {
       String text = null;
       try {
         text = r.readLine();
-      } catch (IOException e1) {
-        e1.printStackTrace();
+      } catch (IOException e) {
+        logger.warn("Can't get stock data",e);
         break;
       }
 
@@ -442,7 +434,7 @@ public class YahooImport {
       try {
         d = df.parse(t[0]);
       } catch (ParseException e) {
-        e.printStackTrace();
+        logger.warn("Can't parse date.", e);
         continue;
       }
 
