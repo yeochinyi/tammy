@@ -1,6 +1,8 @@
 #!/bin/bash
 #set -x
 
+cd "$(dirname "$0")"
+
 export CLASSPATH=conf
 for FILE in lib/*.jar
 do	
