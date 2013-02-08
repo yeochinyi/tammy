@@ -15,11 +15,11 @@ import javax.jdo.Query;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.moomoocow.tammy.model.Exchange;
-import org.moomoocow.tammy.model.Helper;
 import org.moomoocow.tammy.model.Stock;
 import org.moomoocow.tammy.model.StockHistoricalData;
+import org.moomoocow.tammy.model.util.Helper;
 
-public class StockSimulator {
+public class Simulator {
     
   public enum Side {
     B, S, H
@@ -28,11 +28,11 @@ public class StockSimulator {
   private PersistenceManager pm;
 
   public static final void main(String args[]) {
-    StockSimulator bta = new StockSimulator();
+    Simulator bta = new Simulator();
     bta.testStocks();
   }
   
-  public StockSimulator(){
+  public Simulator(){
     this.pm = Helper.SINGLETON.getPersistenceManager();
   }
 
@@ -57,7 +57,7 @@ public class StockSimulator {
     Side ops = Side.H;
     Double accumulatedMultipler = null;
 
-    MovingAverager ma = new MovingAverager();
+    MA ma = new MA();
 
     List<StockHistoricalData> data = s.getSortedDailyData();
 

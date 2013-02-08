@@ -3,20 +3,20 @@ package org.moomoocow.tammy.analysis;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MovingAverager {
+public class MA {
 
   public final static void main(String[] args) {
-    MovingAverager ta = new MovingAverager();
+    MA ta = new MA();
     System.out.println(ta.add(1.0).add(2.0).add(3.0).getMA(2));
   }
 
   private List<Double> data;
 
-  public MovingAverager() {
+  public MA() {
     this.data = new ArrayList<Double>();
   }
 
-  public MovingAverager add(Double d) {
+  public MA add(Double d) {
     data.add(d);
     return this;
   }

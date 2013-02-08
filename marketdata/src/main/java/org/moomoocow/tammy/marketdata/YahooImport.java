@@ -23,11 +23,11 @@ import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.moomoocow.tammy.model.Exchange;
-import org.moomoocow.tammy.model.Helper;
 import org.moomoocow.tammy.model.Stock;
 import org.moomoocow.tammy.model.StockHistoricalData;
 import org.moomoocow.tammy.model.StockSnapshotData;
 import org.moomoocow.tammy.model.YahooData;
+import org.moomoocow.tammy.model.util.Helper;
 
 import com.mdimension.jchronic.Chronic;
 

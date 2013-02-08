@@ -1,8 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  
-  
-  	<parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+
+	<parent>
 		<groupId>org.moomoocow.tammy</groupId>
 		<artifactId>tammy-root</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
@@ -10,26 +11,30 @@
 
 	<artifactId>analysis</artifactId>
 	<name>analysis</name>
-    
-  <properties>
-  </properties>
-  
-  <build>
-          <plugins>
-        </plugins>
-  </build>
-  
-  <dependencies>
+
+	<properties>
+	</properties>
+
+	<build>
+		<plugins>
+		</plugins>
+	</build>
+
+	<dependencies>
 		<dependency>
-			<groupId>${groupId}</groupId>
-			<artifactId>marketdata</artifactId>
-			<version>${version}</version>
-		</dependency>			
-<dependency>
-  <groupId>joda-time</groupId>
-  <artifactId>joda-time</artifactId>
-  <version>2.1</version>
-</dependency>		
-  
-  </dependencies>
+		  <groupId>${groupId}</groupId>
+		  <artifactId>model</artifactId>
+		  <version>${version}</version>
+		</dependency>
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jfree</groupId>
+			<artifactId>jfreechart</artifactId>
+			<version>1.0.14</version>
+		</dependency>
+	</dependencies>
 </project>
