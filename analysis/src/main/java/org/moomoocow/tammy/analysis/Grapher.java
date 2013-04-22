@@ -41,6 +41,10 @@ public class Grapher extends ApplicationFrame {
   
   //private static final Calendar calendar = Calendar.getInstance();
   
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 4438595343592513192L;
   private JFreeChart localJFreeChart; 
   private XYPlot localXYPlot;
   private OHLCSeriesCollection localOHLCSeriesCollection;
@@ -121,6 +125,7 @@ public class Grapher extends ApplicationFrame {
     setContentPane(localChartPanel);
   }
   
+  @SuppressWarnings("unchecked")
   private void createDataset() {
 
     PersistenceManager pm = Helper.SINGLETON.getPersistenceManager();

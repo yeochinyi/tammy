@@ -25,21 +25,24 @@ public class Simulator {
     B, S, H
   };
   
+  private String symbol;
+  
   private PersistenceManager pm;
 
   public static final void main(String args[]) {
-    Simulator bta = new Simulator();
+    Simulator bta = new Simulator(args[0]);
     bta.testStocks();
   }
   
-  public Simulator(){
+  public Simulator(String symbol){
     this.pm = Helper.SINGLETON.getPersistenceManager();
+    this.symbol = symbol;
   }
 
   @SuppressWarnings("unchecked")
   public void testStocks() {
 
-    Query q = pm.newQuery(Exchange.class,"this.code == 'TEST'");
+    Query q = pm.newQuery(Exchange.class,"this.code == '" + symbol + "'");
     List<Exchange> e = (List<Exchange> ) q.execute();
        
     for (Stock stock : e.get(0).getActiveStocks()) {
