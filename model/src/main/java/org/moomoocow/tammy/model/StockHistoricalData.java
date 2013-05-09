@@ -110,6 +110,7 @@ public class StockHistoricalData extends BasePersistData implements Comparable<S
   }
 
   public Long getVol() {
+    //if(vol > 1000000) return 0L;
     return vol;
   }
 

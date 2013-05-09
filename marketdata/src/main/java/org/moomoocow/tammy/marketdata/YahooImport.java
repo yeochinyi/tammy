@@ -201,7 +201,8 @@ public class YahooImport {
 
     try {
       while ((text = r.readLine()) != null) {
-        logger.info(text);
+        if(logger.isDebugEnabled())
+          logger.debug(text);
 
         StockSnapshotData ssData = new StockSnapshotData();
 
@@ -216,23 +217,28 @@ public class YahooImport {
 
         List<String> newT = new ArrayList<String>();
 
-        logger.info("Old array");
+        if(logger.isDebugEnabled())
+          logger.debug("Old array");
         for (int i = 0; i < t.length; i++) {
 
-          logger.info(i + "->" + t[i]);
+          if(logger.isDebugEnabled())
+            logger.debug(i + "->" + t[i]);
 
           if (!t[i].trim().equals("")) {
             newT.add(t[i]);
           } else {
-            logger.info("Chopped 1 blank");
+            if(logger.isDebugEnabled())
+              logger.debug("Chopped 1 blank");
           }
         }
 
         t = newT.toArray(new String[newT.size()]);
 
-        logger.info("New array");
+        if(logger.isDebugEnabled())
+          logger.debug("New array");
         for (int i = 0; i < t.length; i++) {
-          logger.info(i + "->" + t[i]);
+          if(logger.isDebugEnabled())
+            logger.debug(i + "->" + t[i]);
         }
 
         logger.info("Parsing num of fields=" + fields.size());
@@ -260,7 +266,7 @@ public class YahooImport {
             try {
               v = Chronic.parse(value).getEndCalendar().getTime();
             } catch (Exception e) {
-              logger.info("Can't parse '" + value + "' to Date/Time");
+              logger.warn("Can't parse '" + value + "' to Date/Time");
 
             }
           } else if (c.equals(String.class)) {
@@ -270,7 +276,7 @@ public class YahooImport {
               value = value.replaceAll("%+", "");
               v = Double.parseDouble(value);
             } catch (Exception e) {
-              logger.info("Can't parse '" + value + "' to Double");
+              logger.warn("Can't parse '" + value + "' to Double");
             }
           } else if (c.equals(BigInteger.class)) {
             try {
@@ -284,13 +290,13 @@ public class YahooImport {
                 // v = m.getRealValue(d1);
               }
             } catch (Exception e) {
-              logger.info("Can't parse '" + value + "' to BigInt");
+              logger.warn("Can't parse '" + value + "' to BigInt");
             }
           } else {
             try {
               v = Long.parseLong(value);
             } catch (NumberFormatException e) {
-              logger.info("Can't parse '" + value + "' to Long");
+              logger.warn("Can't parse '" + value + "' to Long");
             }
           }
 
@@ -367,7 +373,8 @@ public class YahooImport {
       if (text == null)
         break;
 
-      logger.info(text);
+      if(logger.isDebugEnabled())
+        logger.debug(text);
 
       String[] t = text.split(",");
 
@@ -426,7 +433,8 @@ public class YahooImport {
       if (text == null)
         break;
 
-      logger.info(text);
+      if(logger.isDebugEnabled())
+        logger.debug(text);
 
       String[] t = text.split(",");
 
@@ -440,7 +448,7 @@ public class YahooImport {
 
       if (filecount == 0) {
         if (lastDD != null && d.equals(lastDD.getDate())) {
-          logger.info("No new data as first date is equal db max.");
+          logger.warn("No new data as first date is equal db max.");
           break;
         } else {
           lastHistoricalDate = d;
