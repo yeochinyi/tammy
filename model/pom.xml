@@ -43,24 +43,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.2.1</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>java</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<classpathScope>test</classpathScope>
-					<includeProjectDependencies>true</includeProjectDependencies>
-					<includePluginDependencies>true</includePluginDependencies>
-					<mainClass> org.moomoocow.tammy.marketdata.test.Main</mainClass>
-				</configuration>
-			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
