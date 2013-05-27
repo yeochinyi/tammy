@@ -14,7 +14,6 @@ import javax.jdo.Query;
 
 import org.joda.time.DateTime;
 import org.joda.time.Days;
-import org.moomoocow.tammy.model.Exchange;
 import org.moomoocow.tammy.model.Stock;
 import org.moomoocow.tammy.model.StockHistoricalData;
 import org.moomoocow.tammy.model.util.Helper;
@@ -28,32 +27,43 @@ public class Simulator {
   private String symbol;
   
   private PersistenceManager pm;
+  
+  private int days;
+  private int maLong;
+  private int maShort;
+    
 
   public static final void main(String args[]) {
-    Simulator bta = new Simulator(args[0]);
+    Simulator bta = new Simulator(args[0], 
+        Integer.parseInt(args[1]),
+        Integer.parseInt(args[2]),
+            Integer.parseInt(args[3]));
     bta.testStocks();
   }
   
-  public Simulator(String symbol){
+  public Simulator(String symbol, int days, int maLong, int maShort){
     this.pm = Helper.SINGLETON.getPersistenceManager();
     this.symbol = symbol;
+    this.days = days;
+    this.maLong = maLong;
+    this.maShort = maShort;
   }
 
   @SuppressWarnings("unchecked")
   public void testStocks() {
 
-    Query q = pm.newQuery(Exchange.class,"this.code == '" + symbol + "'");
-    List<Exchange> e = (List<Exchange> ) q.execute();
-       
-    for (Stock stock : e.get(0).getActiveStocks()) {
-      simulate(stock);
-    }
+    Query q = pm.newQuery(Stock.class,"this.code == '" + symbol + "'");
+    List<Stock> s = (List<Stock> ) q.execute();
+           
+    simulate(s.get(0));
   }
+    
 
   public void simulate(Stock s) {
 
     double cash = 100;
     double stock = 0;
+    double commission = 0.004;
 
     int trans = 0;
 
@@ -62,7 +72,7 @@ public class Simulator {
 
     MA ma = new MA();
 
-    List<StockHistoricalData> data = s.getSortedDailyData();
+    //List<StockHistoricalData> data = s.getSortedDailyData();
 
     double mid = 0.0;
     double open = 0.0;
@@ -71,18 +81,30 @@ public class Simulator {
     double low = 0.0;
     
     Date lastTransDate = null;
+    
+    List<StockHistoricalData> sortedDailyData = s.getSortedDailyData();
+    
+    int sortedDailyDataSize = sortedDailyData.size();
+    
+    int x = (sortedDailyDataSize < days ? 0 : sortedDailyDataSize - days);
 
-    for (int i = 0; i < data.size(); i++) {
+    boolean firstTrans = true;
+    
+    while(x < sortedDailyDataSize){
+      
+      StockHistoricalData h = sortedDailyData.get(x++);
 
-      StockHistoricalData h = data.get(i);
+    //for (int i = 0; i < data.size(); i++) {
+      //StockHistoricalData h = sortedDailyData.get(x);
       //System.out.println(h);
 
-      if (i == 0){
+      if (firstTrans){
+        firstTrans=false;
         lastTransDate = h.getDate();
         continue;
       }
 
-      StockHistoricalData p = data.get(i - 1);
+      StockHistoricalData p = sortedDailyData.get(x - 1);
       accumulatedMultipler = h.accumlateMultiplers(accumulatedMultipler);
 
       mid = h.getAccX(MID);
@@ -95,28 +117,28 @@ public class Simulator {
 
       switch (ops) {
       case B:
-        stock = cash / mid;
+        stock = cash * (1.0 - commission) / mid;
         cash = 0;
         int diffDays = Days.daysBetween(new DateTime(lastTransDate), new DateTime(h.getDate())).getDays();
         lastTransDate = h.getDate();
-        System.out.println(" B@" + mid + "->" + stock + " units, diffDays=" + diffDays);        
+        System.out.println(" B@" + mid + "->" + stock + " units, diffDays=" + diffDays + ",date=" + lastTransDate);        
         trans++;
         break;
       case S:
-        cash = stock * mid;
+        cash = stock * mid * (1.0 - commission);
         stock = 0;
         trans++;
         diffDays = Days.daysBetween(new DateTime(lastTransDate), new DateTime(h.getDate())).getDays();
         lastTransDate = h.getDate();
-        System.out.println("S@" + mid + "->" + cash + " dollars, diffDays=" + diffDays);
+        System.out.println("S@" + mid + "->" + cash + " dollars, diffDays=" + diffDays + ",date=" + lastTransDate);
         break;
       case H: // do nothing
         //System.out.println("Hold");
         break;
       }
 
-      Double maShort = ma.getMA(7);
-      Double maLong = ma.getMA(14);
+      Double maShort = ma.getMA(this.maShort);
+      Double maLong = ma.getMA(this.maLong);
       
       // Buy on next
       //if (close < open && cash > 0) {
@@ -132,7 +154,7 @@ public class Simulator {
       }
     }
 
-    double firstMid = data.get(0).getMid();
+    double firstMid = sortedDailyData.get(0).getMid();
 
     System.out.println("BS PL -> " + (int) (cash + (stock * mid) - 100)
         + ", trans=" + trans + ", Cash=" + (int) cash + ", stock ="

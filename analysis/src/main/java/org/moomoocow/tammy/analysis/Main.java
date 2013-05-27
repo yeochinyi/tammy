@@ -61,10 +61,10 @@ public class Main {
         MAList.add(new Integer(split[i]));
       }        
       
-      Grapher localCandlestickChartDemo1 = new Grapher("TEST",MAList);
-      localCandlestickChartDemo1.pack();
-      RefineryUtilities.centerFrameOnScreen(localCandlestickChartDemo1);
-      localCandlestickChartDemo1.setVisible(true);      
+      //Grapher localCandlestickChartDemo1 = new Grapher("TEST",MAList);
+      //localCandlestickChartDemo1.pack();
+      //RefineryUtilities.centerFrameOnScreen(localCandlestickChartDemo1);
+      //localCandlestickChartDemo1.setVisible(true);      
     }
         
     

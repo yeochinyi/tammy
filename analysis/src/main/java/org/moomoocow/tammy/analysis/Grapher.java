@@ -55,10 +55,13 @@ public class Grapher extends ApplicationFrame {
   private List<TimeSeries> mATimeSeries;
   
   private String symbol;
+  
+  private int days;
 
-  public Grapher(String symbol, List<Integer> mAPeriods) {
+  public Grapher(String symbol, int days, List<Integer> mAPeriods) {
     super(symbol);
     
+    this.days = days;
     this.symbol = symbol;
     this.mAPeriods = mAPeriods;
     
@@ -129,15 +132,10 @@ public class Grapher extends ApplicationFrame {
   private void createDataset() {
 
     PersistenceManager pm = Helper.SINGLETON.getPersistenceManager();
-    Query q = pm.newQuery(Exchange.class,"this.code == '" + symbol + "'");
-    List<Exchange> e = (List<Exchange> ) q.execute();
+    Query q = pm.newQuery(Stock.class,"this.code == '" + symbol + "'");
+    List<Stock> s = (List<Stock> ) q.execute();
        
-    Stock stock = null;
-    
-    
-    for(Stock s  : e.get(0).getActiveStocks()){
-      stock = s;
-    }
+    Stock stock = s.get(0);
 
     Double accumulatedMultipler = null;
     MA ma = new MA();
@@ -152,7 +150,15 @@ public class Grapher extends ApplicationFrame {
 
     volTimeSeries = new TimeSeries("VOL");
     
-    for(StockHistoricalData h : stock.getSortedDailyData()){
+    List<StockHistoricalData> sortedDailyData = stock.getSortedDailyData();
+    
+    int sortedDailyDataSize = sortedDailyData.size();
+    
+    int x = (sortedDailyDataSize < days ? 0 : sortedDailyDataSize - days);
+                
+    while(x < sortedDailyDataSize){
+      
+      StockHistoricalData h = sortedDailyData.get(x++);
       
       accumulatedMultipler = h.accumlateMultiplers(accumulatedMultipler);
       
@@ -193,14 +199,17 @@ public class Grapher extends ApplicationFrame {
     //return localChartPanel;
   //}
 
-  public static void main(String[] MAs) {
+  public static void main(String[] args) {
+    
+    int days = Integer.parseInt(args[1]);
     
     List<Integer> MAList = new ArrayList<Integer>();
-    for (int i = 0; i < MAs.length; i++) {
-      MAList.add(new Integer(MAs[i]));
+            
+    for (int i = 2; i < args.length; i++) {
+      MAList.add(new Integer(args[i]));
     }
     
-    Grapher localCandlestickChartDemo1 = new Grapher("TEST",MAList);
+    Grapher localCandlestickChartDemo1 = new Grapher(args[0],days,MAList);
     localCandlestickChartDemo1.pack();
     RefineryUtilities.centerFrameOnScreen(localCandlestickChartDemo1);
     localCandlestickChartDemo1.setVisible(true);
