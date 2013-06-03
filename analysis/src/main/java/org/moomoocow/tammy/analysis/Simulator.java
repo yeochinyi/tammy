@@ -41,13 +41,13 @@ public class Simulator {
     SimulatorListener l = new SimulatorListener(){
 
       @Override
-      public void buy(double price, double qty, Date d, int holdingDays) {
-        System.out.println(" B@" + String.format("%.2g", price) + " qty->" + String.format("%.2g",qty) + " units, diffDays=" + holdingDays + ",date=" + d);
+      public void buy(double price, long qty, Date d, int holdingDays) {
+        System.out.println(" B@" + String.format("%(,.2f", price) + " qty->" + qty + " units, diffDays=" + holdingDays + ",date=" + d);
       }
 
       @Override
-      public void sell(double price, double cash, Date d, int holdingDays) {
-        System.out.println(" S@" + String.format("%.2g", price) + " cash-> " + String.format("%.2g",cash) + "dollars, diffDays=" + holdingDays + ",date=" + d);
+      public void sell(double price, long qty, Date d, int holdingDays) {
+        System.out.println(" S@" + String.format("%(,.2f", price) + " qty-> " + qty + "dollars, diffDays=" + holdingDays + ",date=" + d);
       }
       
     };
@@ -82,7 +82,7 @@ public class Simulator {
   private void simulate(Stock s) {
 
     double cash = 100;
-    double stock = 0;
+    long stock = 0;
     double commission = 0.004;
 
     int trans = 0;
@@ -112,6 +112,8 @@ public class Simulator {
     
     double firstMid = sortedDailyData.get(x).getMid();
     
+    boolean isHolding = false;
+    
     while(x < sortedDailyDataSize){
       
       StockHistoricalData h = sortedDailyData.get(x++);
@@ -136,23 +138,27 @@ public class Simulator {
       low = h.getAccX(LOW);
       
       ma.add(mid);
+      
+      
 
       switch (ops) {
       case B:
-        stock = cash * (1.0 - commission) / mid;
-        cash = 0;
+        stock = (long) Math.floor(cash * (1.0 - commission) / mid);
+        cash = (cash - (stock * mid));
         int diffDays = Days.daysBetween(new DateTime(lastTransDate), new DateTime(h.getDate())).getDays();
         lastTransDate = h.getDate();
         this.listener.buy(mid, stock, lastTransDate,diffDays);
         trans++;
+        isHolding = true;
         break;
       case S:
-        cash = stock * mid * (1.0 - commission);
-        stock = 0;
+        cash = cash + (stock * mid * (1.0 - commission));       
         trans++;
         diffDays = Days.daysBetween(new DateTime(lastTransDate), new DateTime(h.getDate())).getDays();
         lastTransDate = h.getDate();
         this.listener.sell(mid, stock, lastTransDate,diffDays);
+        isHolding = false;
+        stock = 0;
         break;
       case H: // do nothing
         //System.out.println("Hold");
@@ -164,11 +170,11 @@ public class Simulator {
       
       // Buy on next
       //if (close < open && cash > 0) {
-      if (maShort != null  && maLong != null && maLong > maShort && close < open && cash > 0) {
+      if (maShort != null  && maLong != null && maLong > maShort && !isHolding) {
         ops = Side.B;
         
       } // Sell on next
-      else if (maShort != null  && maLong != null && maLong < maShort && close > open && stock > 0) {
+      else if (maShort != null  && maLong != null && maLong < maShort && isHolding) {
         ops = Side.S;
         
       } else {

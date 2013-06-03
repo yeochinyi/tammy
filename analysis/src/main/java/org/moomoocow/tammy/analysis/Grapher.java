@@ -76,8 +76,19 @@ public class Grapher extends ApplicationFrame {
       
       Date lastBuyDate = null;
       
+      public void addPointerAnno(boolean isBuy, double price, long qty, Date d){
+        XYPointerAnnotation localXYPointerAnnotation = new XYPointerAnnotation(
+            (isBuy ? "B":"S" ) + "@" + String.format("%(,.2f", price), new Day(d).getFirstMillisecond(), price, 2.356194490192345D);
+        localXYPointerAnnotation.setBaseRadius(10.0D);
+        localXYPointerAnnotation.setTipRadius(0.0D);
+        localXYPointerAnnotation.setPaint(Color.blue);
+        localXYPointerAnnotation.setTextAnchor(TextAnchor.HALF_ASCENT_RIGHT);
+        localXYPlot.addAnnotation(localXYPointerAnnotation);
+
+      }
+      
       @Override
-      public void sell(double price, double qty, Date d, int holdingDays) {
+      public void sell(double price, long qty, Date d, int holdingDays) {
         IntervalMarker localIntervalMarker = new IntervalMarker(new Day(lastBuyDate).getFirstMillisecond(), new Day(d).getFirstMillisecond());
         localIntervalMarker.setLabelOffsetType(LengthAdjustmentType.EXPAND);
         localIntervalMarker.setPaint(new Color(150, 150, 255));
@@ -87,26 +98,13 @@ public class Grapher extends ApplicationFrame {
         localIntervalMarker.setLabelTextAnchor(TextAnchor.TOP_RIGHT);
         localXYPlot.addDomainMarker(localIntervalMarker, Layer.BACKGROUND);
         
-        XYPointerAnnotation localXYPointerAnnotation = new XYPointerAnnotation("Sell@" + String.format("%.2g", price), new Day(d).getFirstMillisecond(), price, 2.356194490192345D);
-        localXYPointerAnnotation.setBaseRadius(10.0D);
-        localXYPointerAnnotation.setTipRadius(0.0D);
-        localXYPointerAnnotation.setPaint(Color.blue);
-        localXYPointerAnnotation.setTextAnchor(TextAnchor.HALF_ASCENT_RIGHT);
-        localXYPlot.addAnnotation(localXYPointerAnnotation);
-
-        
+        addPointerAnno(false, price, qty, d);
       }
       
       @Override
-      public void buy(double price, double qty, Date d, int holdingDays) {
-        lastBuyDate = d;
-        
-        XYPointerAnnotation localXYPointerAnnotation = new XYPointerAnnotation("Buy@" + String.format("%.2g", price), new Day(d).getFirstMillisecond(), price, 2.356194490192345D);
-        localXYPointerAnnotation.setBaseRadius(10.0D);
-        localXYPointerAnnotation.setTipRadius(0.0D);
-        localXYPointerAnnotation.setPaint(Color.blue);
-        localXYPointerAnnotation.setTextAnchor(TextAnchor.HALF_ASCENT_RIGHT);
-        localXYPlot.addAnnotation(localXYPointerAnnotation);
+      public void buy(double price, long qty, Date d, int holdingDays) {
+        lastBuyDate = d;        
+        addPointerAnno(true, price, qty, d);
       }
     });
     
