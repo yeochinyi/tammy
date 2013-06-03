@@ -6,10 +6,13 @@ import static org.moomoocow.tammy.model.StockHistoricalData.Price.LOW;
 import static org.moomoocow.tammy.model.StockHistoricalData.Price.MID;
 import static org.moomoocow.tammy.model.StockHistoricalData.Price.OPEN;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.jdo.PersistenceManager;
@@ -19,9 +22,12 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.annotations.XYDrawableAnnotation;
+import org.jfree.chart.annotations.XYPointerAnnotation;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
+import org.jfree.chart.plot.IntervalMarker;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
@@ -31,8 +37,11 @@ import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.time.ohlc.OHLCSeries;
 import org.jfree.data.time.ohlc.OHLCSeriesCollection;
 import org.jfree.ui.ApplicationFrame;
+import org.jfree.ui.Layer;
+import org.jfree.ui.LengthAdjustmentType;
+import org.jfree.ui.RectangleAnchor;
 import org.jfree.ui.RefineryUtilities;
-import org.moomoocow.tammy.model.Exchange;
+import org.jfree.ui.TextAnchor;
 import org.moomoocow.tammy.model.Stock;
 import org.moomoocow.tammy.model.StockHistoricalData;
 import org.moomoocow.tammy.model.util.Helper;
@@ -57,9 +66,49 @@ public class Grapher extends ApplicationFrame {
   private String symbol;
   
   private int days;
+  
+  private Simulator s;
 
   public Grapher(String symbol, int days, List<Integer> mAPeriods) {
     super(symbol);
+    
+    this.s = new Simulator(symbol, days, mAPeriods.get(0), mAPeriods.get(1), new SimulatorListener() {
+      
+      Date lastBuyDate = null;
+      
+      @Override
+      public void sell(double price, double qty, Date d, int holdingDays) {
+        IntervalMarker localIntervalMarker = new IntervalMarker(new Day(lastBuyDate).getFirstMillisecond(), new Day(d).getFirstMillisecond());
+        localIntervalMarker.setLabelOffsetType(LengthAdjustmentType.EXPAND);
+        localIntervalMarker.setPaint(new Color(150, 150, 255));
+        localIntervalMarker.setLabel("Holding Period");
+        localIntervalMarker.setLabelPaint(Color.blue);
+        localIntervalMarker.setLabelAnchor(RectangleAnchor.TOP_LEFT);
+        localIntervalMarker.setLabelTextAnchor(TextAnchor.TOP_RIGHT);
+        localXYPlot.addDomainMarker(localIntervalMarker, Layer.BACKGROUND);
+        
+        XYPointerAnnotation localXYPointerAnnotation = new XYPointerAnnotation("Sell@" + String.format("%.2g", price), new Day(d).getFirstMillisecond(), price, 2.356194490192345D);
+        localXYPointerAnnotation.setBaseRadius(10.0D);
+        localXYPointerAnnotation.setTipRadius(0.0D);
+        localXYPointerAnnotation.setPaint(Color.blue);
+        localXYPointerAnnotation.setTextAnchor(TextAnchor.HALF_ASCENT_RIGHT);
+        localXYPlot.addAnnotation(localXYPointerAnnotation);
+
+        
+      }
+      
+      @Override
+      public void buy(double price, double qty, Date d, int holdingDays) {
+        lastBuyDate = d;
+        
+        XYPointerAnnotation localXYPointerAnnotation = new XYPointerAnnotation("Buy@" + String.format("%.2g", price), new Day(d).getFirstMillisecond(), price, 2.356194490192345D);
+        localXYPointerAnnotation.setBaseRadius(10.0D);
+        localXYPointerAnnotation.setTipRadius(0.0D);
+        localXYPointerAnnotation.setPaint(Color.blue);
+        localXYPointerAnnotation.setTextAnchor(TextAnchor.HALF_ASCENT_RIGHT);
+        localXYPlot.addAnnotation(localXYPointerAnnotation);
+      }
+    });
     
     this.days = days;
     this.symbol = symbol;
@@ -72,7 +121,8 @@ public class Grapher extends ApplicationFrame {
             
     createDataset();
     
-    localJFreeChart = ChartFactory.createHighLowChart(symbol, "Date", "Price", localOHLCSeriesCollection, true);
+    //localJFreeChart = ChartFactory.createHighLowChart(symbol, "Date", "Price", localOHLCSeriesCollection, true);
+    localJFreeChart = ChartFactory.createCandlestickChart(symbol, "Date", "Price", localOHLCSeriesCollection, true);
     localXYPlot = (XYPlot)localJFreeChart.getPlot();
 
     //Domain Axis
@@ -114,6 +164,8 @@ public class Grapher extends ApplicationFrame {
     //localXYBarRenderer.setBarPainter(new StandardXYBarPainter());    
     localXYPlot.setRenderer(graphIndex, localXYBarRenderer);
     
+    this.s.testStocks();
+    
     ChartUtilities.applyCurrentTheme(localJFreeChart);
 
     
@@ -126,6 +178,8 @@ public class Grapher extends ApplicationFrame {
 
     localChartPanel.setPreferredSize(new Dimension(500, 270));
     setContentPane(localChartPanel);
+    
+    
   }
   
   @SuppressWarnings("unchecked")

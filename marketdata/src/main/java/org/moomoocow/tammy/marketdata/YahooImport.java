@@ -477,6 +477,7 @@ public class YahooImport {
         Double multipler = prevDD.getCloseMultipler()
             / currDD.getCloseMultipler();
         if (Math.abs(multipler - 1) > 0.01) {
+          if(multipler.isInfinite()) multipler = Double.MAX_VALUE;
           prevDD.setMultipler(multipler);
           hasMultipler = true;
         }

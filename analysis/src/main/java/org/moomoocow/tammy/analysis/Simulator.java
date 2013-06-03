@@ -20,6 +20,7 @@ import org.moomoocow.tammy.model.util.Helper;
 
 public class Simulator {
     
+    
   public enum Side {
     B, S, H
   };
@@ -31,22 +32,41 @@ public class Simulator {
   private int days;
   private int maLong;
   private int maShort;
+  
+  private SimulatorListener listener;
     
 
   public static final void main(String args[]) {
+    
+    SimulatorListener l = new SimulatorListener(){
+
+      @Override
+      public void buy(double price, double qty, Date d, int holdingDays) {
+        System.out.println(" B@" + String.format("%.2g", price) + " qty->" + String.format("%.2g",qty) + " units, diffDays=" + holdingDays + ",date=" + d);
+      }
+
+      @Override
+      public void sell(double price, double cash, Date d, int holdingDays) {
+        System.out.println(" S@" + String.format("%.2g", price) + " cash-> " + String.format("%.2g",cash) + "dollars, diffDays=" + holdingDays + ",date=" + d);
+      }
+      
+    };
+    
     Simulator bta = new Simulator(args[0], 
         Integer.parseInt(args[1]),
         Integer.parseInt(args[2]),
-            Integer.parseInt(args[3]));
+            Integer.parseInt(args[3]), l);
     bta.testStocks();
   }
   
-  public Simulator(String symbol, int days, int maLong, int maShort){
+  public Simulator(String symbol, int days, int maLong, int maShort,SimulatorListener listeners){
     this.pm = Helper.SINGLETON.getPersistenceManager();
     this.symbol = symbol;
     this.days = days;
     this.maLong = maLong;
     this.maShort = maShort;
+    
+    this.listener = listeners;
   }
 
   @SuppressWarnings("unchecked")
@@ -59,7 +79,7 @@ public class Simulator {
   }
     
 
-  public void simulate(Stock s) {
+  private void simulate(Stock s) {
 
     double cash = 100;
     double stock = 0;
@@ -89,6 +109,8 @@ public class Simulator {
     int x = (sortedDailyDataSize < days ? 0 : sortedDailyDataSize - days);
 
     boolean firstTrans = true;
+    
+    double firstMid = sortedDailyData.get(x).getMid();
     
     while(x < sortedDailyDataSize){
       
@@ -121,7 +143,7 @@ public class Simulator {
         cash = 0;
         int diffDays = Days.daysBetween(new DateTime(lastTransDate), new DateTime(h.getDate())).getDays();
         lastTransDate = h.getDate();
-        System.out.println(" B@" + mid + "->" + stock + " units, diffDays=" + diffDays + ",date=" + lastTransDate);        
+        this.listener.buy(mid, stock, lastTransDate,diffDays);
         trans++;
         break;
       case S:
@@ -130,7 +152,7 @@ public class Simulator {
         trans++;
         diffDays = Days.daysBetween(new DateTime(lastTransDate), new DateTime(h.getDate())).getDays();
         lastTransDate = h.getDate();
-        System.out.println("S@" + mid + "->" + cash + " dollars, diffDays=" + diffDays + ",date=" + lastTransDate);
+        this.listener.sell(mid, stock, lastTransDate,diffDays);
         break;
       case H: // do nothing
         //System.out.println("Hold");
@@ -154,7 +176,7 @@ public class Simulator {
       }
     }
 
-    double firstMid = sortedDailyData.get(0).getMid();
+    
 
     System.out.println("BS PL -> " + (int) (cash + (stock * mid) - 100)
         + ", trans=" + trans + ", Cash=" + (int) cash + ", stock ="
