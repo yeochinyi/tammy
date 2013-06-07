@@ -6,189 +6,226 @@ import static org.moomoocow.tammy.model.StockHistoricalData.Price.LOW;
 import static org.moomoocow.tammy.model.StockHistoricalData.Price.MID;
 import static org.moomoocow.tammy.model.StockHistoricalData.Price.OPEN;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.joda.time.DateTime;
 import org.joda.time.Days;
+import org.moomoocow.tammy.analysis.Transaction.REASON;
 import org.moomoocow.tammy.model.Stock;
 import org.moomoocow.tammy.model.StockHistoricalData;
 import org.moomoocow.tammy.model.util.Helper;
 
+/**
+ * Set the stage with historical market prices to be executed
+ * 
+ * @author yeocae
+ * 
+ */
 public class Simulator {
-    
-    
-  public enum Side {
-    B, S, H
-  };
-  
-  private String symbol;
-  
-  private PersistenceManager pm;
-  
-  private int days;
-  private int maLong;
-  private int maShort;
-  
-  private SimulatorListener listener;
-    
 
-  public static final void main(String args[]) {
-    
-    SimulatorListener l = new SimulatorListener(){
+  private List<StockHistoricalData> sortedDailyData;
 
-      @Override
-      public void buy(double price, long qty, Date d, int holdingDays) {
-        System.out.println(" B@" + String.format("%(,.2f", price) + " qty->" + qty + " units, diffDays=" + holdingDays + ",date=" + d);
-      }
-
-      @Override
-      public void sell(double price, long qty, Date d, int holdingDays) {
-        System.out.println(" S@" + String.format("%(,.2f", price) + " qty-> " + qty + "dollars, diffDays=" + holdingDays + ",date=" + d);
-      }
-      
-    };
-    
-    Simulator bta = new Simulator(args[0], 
-        Integer.parseInt(args[1]),
-        Integer.parseInt(args[2]),
-            Integer.parseInt(args[3]), l);
-    bta.testStocks();
+  public List<StockHistoricalData> getSortedDailyData() {
+    return sortedDailyData;
   }
-  
-  public Simulator(String symbol, int days, int maLong, int maShort,SimulatorListener listeners){
-    this.pm = Helper.SINGLETON.getPersistenceManager();
-    this.symbol = symbol;
-    this.days = days;
-    this.maLong = maLong;
-    this.maShort = maShort;
-    
-    this.listener = listeners;
+
+  private Map<Signal, List<Transaction>> actionsMap;
+
+  public Map<Signal, List<Transaction>> getActionsMap() {
+    return actionsMap;
+  }
+
+  private Map<Double, List<Signal>> pnlMap;
+
+  public Map<Double, List<Signal>> getPnlMap() {
+    return pnlMap;
   }
 
   @SuppressWarnings("unchecked")
-  public void testStocks() {
+  public static final void main(String args[]) {
 
-    Query q = pm.newQuery(Stock.class,"this.code == '" + symbol + "'");
-    List<Stock> s = (List<Stock> ) q.execute();
-           
-    simulate(s.get(0));
+    PersistenceManager pm = Helper.SINGLETON.getPersistenceManager();
+    Query q = pm.newQuery(Stock.class, "this.code == '" + args[0] + "'");
+    List<Stock> s = (List<Stock>) q.execute();
+
+    Simulator sim = new Simulator(s.get(0).getSortedDailyData(), 720);
+
+    ActionCondition ac = new ActionCondition(10000.0, 0.20, 0.05, 3);
+    
+    sim.execute(ac, new BuyAndHoldSignal());
+
+    int step = 7;
+    int periods = 10;
+
+    for (int x = step; x <= periods * step; x += step) {
+      for (int y = x + step; y <= periods * step; y += step) {
+        int[] mas = { x, y };
+        sim.execute(ac, new MAHLSignal(mas, true));
+        sim.execute(ac, new MAHLSignal(mas, false));
+      }
+    }
+
+    Map<Signal, List<Transaction>> actionsMap2 = sim.getActionsMap();
+
+    for (Entry<Double, List<Signal>> e : sim.getPnlMap().entrySet()) {
+      System.out.println(e.getKey() + "-->");
+      for (Signal st : e.getValue()) {
+        System.out.println("  " + st.toString() + "->"
+            + actionsMap2.get(st).size());
+      }
+    }
   }
+
+  public Simulator(List<StockHistoricalData> oldSortedDailyData, int days) {
+
+    this.actionsMap = new HashMap<Signal, List<Transaction>>();
+    this.pnlMap = new TreeMap<Double, List<Signal>>(new Comparator<Double>() {
+      @Override
+      public int compare(Double o1, Double o2) {
+        return o1.compareTo(o2) * -1;
+      }
+    });
+
+    final int startOfDays = (oldSortedDailyData.size() < days ? 0
+        : oldSortedDailyData.size() - days);
+    this.sortedDailyData = new ArrayList<StockHistoricalData>();
+
+    // Populated multiplers
+    Double accumulatedMultipler = null;
+    for (int x = startOfDays; x < oldSortedDailyData.size(); x++) {
+      StockHistoricalData h = oldSortedDailyData.get(x);
+      accumulatedMultipler = h.accumlateMultiplers(accumulatedMultipler);
+      this.sortedDailyData.add(h);
+    }
+
+    System.out.println("Total recs = " + this.sortedDailyData.size());
+  }
+
+  private void print(boolean isBuy, double price, long qty, Date d,
+      int holdingDays) {
+    System.out.println((isBuy ? "B" : "S") + "@"
+        + String.format("%(,.2f", price) + ",qty=" + qty + ",diffDays="
+        + holdingDays + ",date=" + String.format("%1$te/%<tm/%<tY", d));
+  }
+
+  public Double execute(ActionCondition ac, Signal signal) {
+
+    List<Transaction> actions = new ArrayList<Transaction>();
+
+    double cash = ac.getInitialCash();
+    long stock = 0;
+    double lastPurchasedPrice = 0.0; 
+    double commissionPercent = 0.004;
+
+    long buySellSignal = 0;
+    Date lastTransDate = null;
     
 
-  private void simulate(Stock s) {
-
-    double cash = 100;
-    long stock = 0;
-    double commission = 0.004;
-
-    int trans = 0;
-
-    Side ops = Side.H;
-    Double accumulatedMultipler = null;
-
-    MA ma = new MA();
-
-    //List<StockHistoricalData> data = s.getSortedDailyData();
+    boolean firstTrans = true;
+    
+    Transaction.REASON r = null;
 
     double mid = 0.0;
     double open = 0.0;
     double close = 0.0;
     double high = 0.0;
     double low = 0.0;
-    
-    Date lastTransDate = null;
-    
-    List<StockHistoricalData> sortedDailyData = s.getSortedDailyData();
-    
-    int sortedDailyDataSize = sortedDailyData.size();
-    
-    int x = (sortedDailyDataSize < days ? 0 : sortedDailyDataSize - days);
 
-    boolean firstTrans = true;
-    
-    double firstMid = sortedDailyData.get(x).getMid();
-    
-    boolean isHolding = false;
-    
-    while(x < sortedDailyDataSize){
-      
-      StockHistoricalData h = sortedDailyData.get(x++);
-
-    //for (int i = 0; i < data.size(); i++) {
-      //StockHistoricalData h = sortedDailyData.get(x);
-      //System.out.println(h);
-
-      if (firstTrans){
-        firstTrans=false;
+    for (int x = 0; x < this.sortedDailyData.size(); x++) {
+      StockHistoricalData h = sortedDailyData.get(x);
+      if (firstTrans) {
+        firstTrans = false;
         lastTransDate = h.getDate();
         continue;
       }
 
-      StockHistoricalData p = sortedDailyData.get(x - 1);
-      accumulatedMultipler = h.accumlateMultiplers(accumulatedMultipler);
+      // StockHistoricalData p = sortedDailyData.get(x - 1);
 
       mid = h.getAccX(MID);
       open = h.getAccX(OPEN);
       close = h.getAccX(CLOSE);
       high = h.getAccX(HIGH);
       low = h.getAccX(LOW);
-      
-      ma.add(mid);
-      
-      
 
-      switch (ops) {
-      case B:
-        stock = (long) Math.floor(cash * (1.0 - commission) / mid);
-        cash = (cash - (stock * mid));
-        int diffDays = Days.daysBetween(new DateTime(lastTransDate), new DateTime(h.getDate())).getDays();
+      int diffDays = Days.daysBetween(new DateTime(lastTransDate),
+          new DateTime(h.getDate())).getDays();
+      // Buy
+      if (buySellSignal > 0 ) {
+        long maxStockAllowed = (long) Math.floor(cash
+            / (mid * (1.0 + commissionPercent) * buySellSignal));
+
+        if(maxStockAllowed == 0){
+          System.out.println("Can't buy anymore stocks");
+          continue;
+        }
+        
+        lastPurchasedPrice = mid;
+        double cashSpentWoCom = maxStockAllowed * mid;
+        double commissionAmt = cashSpentWoCom * 0.04;
+
         lastTransDate = h.getDate();
-        this.listener.buy(mid, stock, lastTransDate,diffDays);
-        trans++;
-        isHolding = true;
-        break;
-      case S:
-        cash = cash + (stock * mid * (1.0 - commission));       
-        trans++;
-        diffDays = Days.daysBetween(new DateTime(lastTransDate), new DateTime(h.getDate())).getDays();
+        actions.add(new Transaction(true, maxStockAllowed, mid, commissionAmt,
+            lastTransDate,r));
+        print(true, mid, maxStockAllowed, h.getDate(), diffDays);
+
+        cash -= (cashSpentWoCom + commissionAmt);
+        stock += maxStockAllowed;
+      }// Sell
+      else if (buySellSignal < 0) {
+        
+        if(stock == 0){
+          System.out.println("Can't sell anymore stocks");
+          continue;
+        }
+
+        double cashReceived = stock * (buySellSignal * -1) * mid;
+        double commissionAmt = cashReceived * 0.04;
+
         lastTransDate = h.getDate();
-        this.listener.sell(mid, stock, lastTransDate,diffDays);
-        isHolding = false;
+        actions.add(new Transaction(false, stock, mid, commissionAmt,
+            lastTransDate,r));
+        print(false, mid, stock, h.getDate(), diffDays);
+
         stock = 0;
-        break;
-      case H: // do nothing
-        //System.out.println("Hold");
-        break;
+        cash += (cashReceived - commissionAmt);
       }
 
-      Double maShort = ma.getMA(this.maShort);
-      Double maLong = ma.getMA(this.maLong);
+      buySellSignal = signal.analyze(h.getDate(), mid, open, close, high, low,
+          h.getVol());
       
-      // Buy on next
-      //if (close < open && cash > 0) {
-      if (maShort != null  && maLong != null && maLong > maShort && !isHolding) {
-        ops = Side.B;
-        
-      } // Sell on next
-      else if (maShort != null  && maLong != null && maLong < maShort && isHolding) {
-        ops = Side.S;
-        
-      } else {
-        ops = Side.H;
+      if(buySellSignal != 0) r = Transaction.REASON.SIGNAL;
+      
+      r = ac.getSignal(stock, lastPurchasedPrice, mid, diffDays);
+      
+      if(r==REASON.STOPLOSS || r==REASON.TAKEPROFIT){
+        buySellSignal = 1;
       }
+      
     }
 
-    
+    this.actionsMap.put(signal, actions);
 
-    System.out.println("BS PL -> " + (int) (cash + (stock * mid) - 100)
-        + ", trans=" + trans + ", Cash=" + (int) cash + ", stock ="
-        + (int) stock + "(cash=" + (int) (stock * mid) + ")");
-    
-    System.out.println("BH PL -> " + (int) ((mid - firstMid) / firstMid * 100)
-        + ", firstMid=" + firstMid + ",mid=" + mid + "");
+    Double pnl = (cash + (stock * mid) - ac.getInitialCash()) / ac.getInitialCash();
+
+    List<Signal> s = pnlMap.get(pnl);
+    if (s == null) {
+      s = new ArrayList<Signal>();
+      pnlMap.put(pnl, s);
+    }
+    s.add(signal);
+
+    System.out.println("PNL=" + String.format("%(,.2f", pnl));
+
+    return pnl;
   }
 }

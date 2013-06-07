@@ -27,7 +27,7 @@
 				<groupId>org.datanucleus</groupId>
 				<artifactId>maven-datanucleus-plugin</artifactId>
 				<!-- version>${dn-version}</version -->
-				<version>3.1.3</version>
+				<version>3.1.1</version>
 				<configuration>
 					<props>target/classes/datanucleus.properties</props>
 					<log4jConfiguration>${basedir}/src/main/resources/log4j.properties</log4jConfiguration>
@@ -66,7 +66,7 @@
 		<dependency>
 			<groupId>org.datanucleus</groupId>
 			<artifactId>datanucleus-core</artifactId>
-			<version>3.1.4</version>
+			<version>3.1.5</version>
 		</dependency>
 
 		<dependency>

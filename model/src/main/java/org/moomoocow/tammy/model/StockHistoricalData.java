@@ -1,8 +1,6 @@
 package org.moomoocow.tammy.model;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.NotPersistent;
@@ -49,6 +47,7 @@ public class StockHistoricalData extends BasePersistData implements Comparable<S
     this.setVol(vol);
     this.setAdjustedClose(adjustedClose);
     this.setDividend(dividend);
+    this.accXPrices = 1.0;
   }
   
   public Double getCloseMultipler(){
@@ -154,25 +153,42 @@ public class StockHistoricalData extends BasePersistData implements Comparable<S
         + ", vol=" + vol + ", multipler=" + multipler + "]";
   }
     
+  //@NotPersistent
+  //private Map<Price,Double> accXPrices;
   @NotPersistent
-  private Map<Price,Double> accXPrices;
+  private Double accXPrices;
   
-  public Double accumlateMultiplers(Double prevAccX){    
-    Double m = (prevAccX == null ? 1.0 : prevAccX) * 
+  public Double accumlateMultiplers(Double prevAccX){
+    this.accXPrices = (prevAccX == null ? 1.0 : prevAccX) * 
       (this.multipler == null ? 1.0 : this.multipler);
-        
-    accXPrices = new HashMap<Price,Double>();
-    accXPrices.put(Price.OPEN, m * getOpen());
-    accXPrices.put(Price.CLOSE, m * getClose());
-    accXPrices.put(Price.HIGH, m * getHigh());
-    accXPrices.put(Price.LOW, m * getLow());
-    accXPrices.put(Price.MID, m * getMid());
-    
-    return m;    
+    return this.accXPrices;
   }  
   
-  public Double getAccX(Price p){    
-    return accXPrices.get(p);
+  public Double getAccX(Price p){
+    //return accXPrices.get(p);
+    Double price = null;
+    switch(p){
+    case CLOSE:
+      price = open;
+      break;
+    case HIGH:
+      price = open;
+      break;
+    case LOW:
+      price = open;
+      break;
+    case MID:
+      price = open;
+      break;
+    case OPEN:
+      price = open;
+      break;
+    default:
+      price = 0.0;
+      break;    
+    }
+    
+    return price * accXPrices;
   }
     
   
