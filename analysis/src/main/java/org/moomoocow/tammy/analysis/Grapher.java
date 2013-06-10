@@ -50,15 +50,13 @@ public class Grapher extends ApplicationFrame {
     super(title);   
   }
   
-  private void draw(Simulator sim, Signal strategy, ActionCondition ac) {
+  private void draw(Simulator sim, Signal strategy) {
     
     OHLCSeriesCollection localOHLCSeriesCollection = new OHLCSeriesCollection();
     TimeSeries volTimeSeries;
     List<TimeSeries> strategiesTimeSeries = new ArrayList<TimeSeries>();
 
-    
-    
-    sim.execute(ac, strategy);    
+    sim.execute(strategy);
     
     final OHLCSeries localOHLCSeries = new OHLCSeries("main");
     localOHLCSeriesCollection.addSeries(localOHLCSeries);
@@ -123,7 +121,7 @@ public class Grapher extends ApplicationFrame {
         
     Date lastBuyDate = null;
     
-    for (Transaction t : sim.getActionsMap().get(strategy)) {
+    for (Deal t : sim.getActionsMap().get(strategy).getTransactions()) {
       if(t.isBuy()){
         lastBuyDate = t.getDate();
         localXYPlot.addAnnotation(addPointerAnno(t));
@@ -150,7 +148,7 @@ public class Grapher extends ApplicationFrame {
     setContentPane(localChartPanel);
   }
   
-  private XYPointerAnnotation addPointerAnno(Transaction t){
+  private XYPointerAnnotation addPointerAnno(Deal t){
     XYPointerAnnotation localXYPointerAnnotation = new XYPointerAnnotation(t.toString()
         , new Day(t.getDate()).getFirstMillisecond(), t.getPrice(), 2.356194490192345D);
     localXYPointerAnnotation.setBaseRadius(10.0D);
@@ -169,16 +167,12 @@ public class Grapher extends ApplicationFrame {
     List<Stock> s = (List<Stock> ) q.execute();
     
     int days = 200;
-    
-    ActionCondition ac = new ActionCondition(10000.0, 0.20, 0.05, 3);
 
-    Simulator sim = new Simulator(s.get(0).getSortedDailyData(), days);  
-    
+    Simulator sim = new Simulator(s.get(0).getSortedDailyData(), days);      
     int[] mas = {30, 14};
-    Signal strategy =new MAHLSignal(mas,true);
 
     Grapher g = new Grapher(args[0]);
-    g.draw(sim, strategy, ac);
+    g.draw(sim, new ActionCondition(new MAHLSignal(mas,true), 0.20, 0.05, 3));
     g.pack();
     RefineryUtilities.centerFrameOnScreen(g);
     g.setVisible(true);
