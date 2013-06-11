@@ -172,7 +172,7 @@ public class Grapher extends ApplicationFrame {
     int[] mas = {30, 14};
 
     Grapher g = new Grapher(args[0]);
-    g.draw(sim, new ActionCondition(new MAHLSignal(mas,true), 0.20, 0.05, 3));
+    g.draw(sim, new ProtectiveSignal(new MAHLSignal(mas,true), 0.20, 0.05, 3));
     g.pack();
     RefineryUtilities.centerFrameOnScreen(g);
     g.setVisible(true);

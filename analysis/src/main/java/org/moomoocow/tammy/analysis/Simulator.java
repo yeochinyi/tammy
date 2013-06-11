@@ -63,8 +63,8 @@ public class Simulator {
     for (int x = step; x <= periods * step; x += step) {
       for (int y = x + step; y <= periods * step; y += step) {
         int[] mas = { x, y };
-        sim.execute(new ActionCondition(new MAHLSignal(mas, true),0.20, 0.05, 3));
-        sim.execute(new ActionCondition(new MAHLSignal(mas, false),0.20, 0.05, 3));
+        sim.execute(new ProtectiveSignal(new MAHLSignal(mas, true),0.20, 0.05, 3));
+        sim.execute(new ProtectiveSignal(new MAHLSignal(mas, false),0.20, 0.05, 3));
       }
     }
 
