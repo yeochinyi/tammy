@@ -54,19 +54,33 @@ public class Simulator {
     Query q = pm.newQuery(Stock.class, "this.code == '" + args[0] + "'");
     List<Stock> s = (List<Stock>) q.execute();
 
-    Simulator sim = new Simulator(s.get(0).getSortedDailyData(), 720);    
+    Simulator sim = new Simulator(s.get(0).getSortedDailyData(), 360);    
     sim.execute(new BuyAndHoldSignal());
 
+    /*
     int step = 7;
     int periods = 10;
 
     for (int x = step; x <= periods * step; x += step) {
       for (int y = x + step; y <= periods * step; y += step) {
         int[] mas = { x, y };
-        sim.execute(new ProtectiveSignal(new MAHLSignal(mas, true),0.20, 0.05, 3));
-        sim.execute(new ProtectiveSignal(new MAHLSignal(mas, false),0.20, 0.05, 3));
+        sim.execute(new ProtectiveSignal(new MAHLSignal(mas, true),null, null, 3));
+        sim.execute(new ProtectiveSignal(new MAHLSignal(mas, false),null, null, 3));
+      }
+    }*/
+    
+    int[] mas = { 7, 42 };
+    for(int x = 5; x <= 30 ; x += 5){
+      for(int y = 5; y <= 30 ; y += 5){
+        for(int z = 0; z <= 5 ; z ++){
+          double xD = ((double) x) / 100.0;
+          double yD = ((double) y) / 100.0;
+          sim.execute(new ProtectiveSignal(new MAHLSignal(mas, true),xD , yD, z));
+          sim.execute(new ProtectiveSignal(new MAHLSignal(mas, false),xD, yD, z));
+        }
       }
     }
+    
 
     Map<Signal, Accountant> actionsMap2 = sim.getActionsMap();
 
@@ -133,8 +147,7 @@ public class Simulator {
       low = h.getAccX(LOW);
 
       // Buy
-      if (r == null){
-        
+      if (r == null){        
       }      
       else if(r.isBuy) {      
         tm.buyAll(mid, h.getDate(), r);
@@ -143,7 +156,7 @@ public class Simulator {
         tm.sellAll(mid, h.getDate(), r);
       }
 
-      r = signal.analyze(h, tm);
+      r = signal.analyze(h.getDate(),open,close,high,low,mid, tm);
     }
 
     this.actionsMap.put(signal, tm);
@@ -157,7 +170,7 @@ public class Simulator {
     }
     s.add(signal);
 
-    System.out.println("PNL=" + String.format("%(,.2f", pnl));
+    //System.out.println("PNL=" + String.format("%(,.2f", pnl));
 
     return pnl;
   }
