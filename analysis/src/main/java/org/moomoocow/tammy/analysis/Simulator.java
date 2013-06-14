@@ -17,6 +17,7 @@ import java.util.TreeMap;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import org.apache.log4j.Logger;
 import org.moomoocow.tammy.model.Stock;
 import org.moomoocow.tammy.model.StockHistoricalData;
 import org.moomoocow.tammy.model.util.Helper;
@@ -28,6 +29,8 @@ import org.moomoocow.tammy.model.util.Helper;
  * 
  */
 public class Simulator {
+  
+  private static final Logger log = Logger.getLogger(Simulator.class);
 
   private List<StockHistoricalData> sortedDailyData;
 
@@ -54,32 +57,45 @@ public class Simulator {
     Query q = pm.newQuery(Stock.class, "this.code == '" + args[0] + "'");
     List<Stock> s = (List<Stock>) q.execute();
 
-    Simulator sim = new Simulator(s.get(0).getSortedDailyData(), 360);    
+    Simulator sim = new Simulator(s.get(0).getSortedDailyData(), 720);    
     sim.execute(new BuyAndHoldSignal());
-
-    /*
+    
+    //int[] mas = { 21, 28 };
+    //sim.execute(new ProtectiveSignal(new MAHLSignal(mas, true),0.08 , 0.08, 30));
+    
+    
     int step = 7;
-    int periods = 10;
+    int periods = 5;
 
     for (int x = step; x <= periods * step; x += step) {
       for (int y = x + step; y <= periods * step; y += step) {
         int[] mas = { x, y };
-        sim.execute(new ProtectiveSignal(new MAHLSignal(mas, true),null, null, 3));
-        sim.execute(new ProtectiveSignal(new MAHLSignal(mas, false),null, null, 3));
+        //sim.execute(new MAHLSignal(mas, true));
+        //sim.execute(new MAHLSignal(mas, false));
+        for(int x1 = 5; x1 <= 20 ; x1 += 3){
+          for(int y1 = 5; y1 <= 20 ; y1 += 3){
+            for(int z1 = 0; z1 <= 10 ; z1 += 2){
+              double xD = ((double) x1) / 100.0;
+              double yD = ((double) y1) / 100.0;
+              sim.execute(new ProtectiveSignal(new MAHLSignal(mas, true),xD , yD, z1));
+              //sim.execute(new ProtectiveSignal(new MAHLSignal(mas, false),xD, yD, z1));
+            }
+          }
+        }
       }
-    }*/
+    }
     
-    int[] mas = { 7, 42 };
+
+    /*
     for(int x = 5; x <= 30 ; x += 5){
       for(int y = 5; y <= 30 ; y += 5){
         for(int z = 0; z <= 5 ; z ++){
           double xD = ((double) x) / 100.0;
           double yD = ((double) y) / 100.0;
-          sim.execute(new ProtectiveSignal(new MAHLSignal(mas, true),xD , yD, z));
-          sim.execute(new ProtectiveSignal(new MAHLSignal(mas, false),xD, yD, z));
+          sim.execute(new ProtectiveSignal(new BuyAndHoldSignal(),xD , yD, z));
         }
       }
-    }
+    }*/
     
 
     Map<Signal, Accountant> actionsMap2 = sim.getActionsMap();
@@ -88,7 +104,7 @@ public class Simulator {
       System.out.println(e.getKey() + "-->");
       for (Signal st : e.getValue()) {
         System.out.println("  " + st.toString() + "->"
-            + actionsMap2.get(st).size());
+            + actionsMap2.get(st));
       }
     }
   }
@@ -146,17 +162,21 @@ public class Simulator {
       high = h.getAccX(HIGH);
       low = h.getAccX(LOW);
 
+      r = signal.analyze(h.getDate(),open,close,high,low,mid, tm);
       // Buy
       if (r == null){        
       }      
       else if(r.isBuy) {      
-        tm.buyAll(mid, h.getDate(), r);
+        if(tm.buyAll(mid, h.getDate(), r)){
+          //log.info("B");
+        }
       }// Sell
       else{
         tm.sellAll(mid, h.getDate(), r);
+        //log.info("S");
       }
 
-      r = signal.analyze(h.getDate(),open,close,high,low,mid, tm);
+      //r = signal.analyze(h.getDate(),open,close,high,low,mid, tm);
     }
 
     this.actionsMap.put(signal, tm);
