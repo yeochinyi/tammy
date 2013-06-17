@@ -1,9 +1,6 @@
 package org.moomoocow.tammy.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 import javax.jdo.annotations.Column;
@@ -65,25 +62,6 @@ public class Stock extends BaseStaticData {
     return priceMultiplied;
   }
   
-  public List<StockHistoricalData> getSortedDailyData() {    
-    List<StockHistoricalData> s = new ArrayList<StockHistoricalData>(getDailyData());
-    Collections.sort(s);    
-    return s;
-  }
- 
-  
-  public StockHistoricalData getMaxDatedDailyData(){
-    
-    StockHistoricalData max = null;
-    
-    for (StockHistoricalData dd : this.getDailyData()) {
-      if(max == null || dd.getDate().after(max.getDate())) 
-        max = dd;
-    }
-    
-    return max;
-  }
-
   public void setLastHistoricalDate(Date lastHistoricalDate) {
     this.lastHistoricalDate = lastHistoricalDate;
   }

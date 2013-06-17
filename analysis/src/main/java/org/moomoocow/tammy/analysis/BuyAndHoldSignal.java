@@ -11,7 +11,7 @@ public class BuyAndHoldSignal implements Signal {
   private boolean bought = false;
   
   @Override
-  public Action analyze(Date date, double open, double close, double high, double low, double mid,Accountant tm) {
+  public Action analyze(Date date, double open, double close, double high, double low, double mid,long vol,Accountant tm) {
     if(!bought){
       bought=true;
       return Action.BUY;

@@ -6,8 +6,13 @@ import static org.moomoocow.tammy.model.StockHistoricalData.Price.LOW;
 import static org.moomoocow.tammy.model.StockHistoricalData.Price.MID;
 import static org.moomoocow.tammy.model.StockHistoricalData.Price.OPEN;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +23,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
+import org.moomoocow.tammy.model.ModelHelper;
 import org.moomoocow.tammy.model.Stock;
 import org.moomoocow.tammy.model.StockHistoricalData;
 import org.moomoocow.tammy.model.util.Helper;
@@ -33,6 +39,8 @@ public class Simulator {
   private static final Logger log = Logger.getLogger(Simulator.class);
 
   private List<StockHistoricalData> sortedDailyData;
+  
+  private final static DateFormat df = new SimpleDateFormat("yyyy-mm-dd");
 
   public List<StockHistoricalData> getSortedDailyData() {
     return sortedDailyData;
@@ -51,13 +59,15 @@ public class Simulator {
   }
 
   @SuppressWarnings("unchecked")
-  public static final void main(String args[]) {
+  public static final void main(String args[]) throws ParseException {
 
     PersistenceManager pm = Helper.SINGLETON.getPersistenceManager();
     Query q = pm.newQuery(Stock.class, "this.code == '" + args[0] + "'");
     List<Stock> s = (List<Stock>) q.execute();
 
-    Simulator sim = new Simulator(s.get(0).getSortedDailyData(), 720);    
+    Date d = args.length > 1 ? df.parse(args[1]) : null ;
+    
+    Simulator sim = new Simulator(s.get(0), d);
     sim.execute(new BuyAndHoldSignal());
     
     //int[] mas = { 21, 28 };
@@ -72,8 +82,8 @@ public class Simulator {
         int[] mas = { x, y };
         //sim.execute(new MAHLSignal(mas, true));
         //sim.execute(new MAHLSignal(mas, false));
-        for(int x1 = 5; x1 <= 20 ; x1 += 3){
-          for(int y1 = 5; y1 <= 20 ; y1 += 3){
+        for(int x1 = 0; x1 <= 20 ; x1 += 5){
+          for(int y1 = 0; y1 <= 20 ; y1 += 5){
             for(int z1 = 0; z1 <= 10 ; z1 += 2){
               double xD = ((double) x1) / 100.0;
               double yD = ((double) y1) / 100.0;
@@ -109,7 +119,7 @@ public class Simulator {
     }
   }
 
-  public Simulator(List<StockHistoricalData> oldSortedDailyData, int days) {
+  public Simulator(Stock s, Date date) {
 
     this.actionsMap = new HashMap<Signal, Accountant>();
     this.pnlMap = new TreeMap<Double, List<Signal>>(new Comparator<Double>() {
@@ -119,19 +129,9 @@ public class Simulator {
       }
     });
 
-    final int startOfDays = (oldSortedDailyData.size() < days ? 0
-        : oldSortedDailyData.size() - days);
-    this.sortedDailyData = new ArrayList<StockHistoricalData>();
-
-    // Populated multiplers
-    Double accumulatedMultipler = null;
-    for (int x = startOfDays; x < oldSortedDailyData.size(); x++) {
-      StockHistoricalData h = oldSortedDailyData.get(x);
-      accumulatedMultipler = h.accumlateMultiplers(accumulatedMultipler);
-      this.sortedDailyData.add(h);
-    }
-
-    System.out.println("Total recs = " + this.sortedDailyData.size());
+    this.sortedDailyData = ModelHelper.prepareDailyData(s,date);
+    log.info("From Date=" + this.sortedDailyData.get(0).getDate() 
+        + " ~ " + this.sortedDailyData.get(this.sortedDailyData.size() - 1).getDate() + " looping " + this.sortedDailyData.size() + " recs.");
   }
 
 
@@ -161,8 +161,7 @@ public class Simulator {
       close = h.getAccX(CLOSE);
       high = h.getAccX(HIGH);
       low = h.getAccX(LOW);
-
-      r = signal.analyze(h.getDate(),open,close,high,low,mid, tm);
+      
       // Buy
       if (r == null){        
       }      
@@ -176,7 +175,7 @@ public class Simulator {
         //log.info("S");
       }
 
-      //r = signal.analyze(h.getDate(),open,close,high,low,mid, tm);
+      r = signal.analyze(h.getDate(),open,close,high,low,mid,h.getVol(), tm);
     }
 
     this.actionsMap.put(signal, tm);

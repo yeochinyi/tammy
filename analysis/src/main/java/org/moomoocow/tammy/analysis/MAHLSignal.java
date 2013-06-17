@@ -45,7 +45,7 @@ public class MAHLSignal implements Signal {
   }
 
   @Override
-  public Action analyze(Date date, double open, double close, double high, double low, double mid, Accountant tm) {
+  public Action analyze(Date date, double open, double close, double high, double low, double mid,long vol, Accountant tm) {
     ma.add(mid);
 
     for (Integer i : maPeriods){ 

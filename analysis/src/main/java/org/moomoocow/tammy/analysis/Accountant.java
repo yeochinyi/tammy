@@ -117,7 +117,8 @@ public class Accountant {
   //}
   
   public double getAbsolutePnl(double price){
-    return BigDecimal.valueOf((cash + (stock * price) - this.initialCash)).
+    double numerator = cash + (stock * price) - this.initialCash;
+    return BigDecimal.valueOf(numerator).
         divide(BigDecimal.valueOf(this.initialCash),2,RoundingMode.HALF_EVEN).doubleValue();
   }
   

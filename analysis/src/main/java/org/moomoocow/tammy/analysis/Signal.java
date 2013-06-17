@@ -9,7 +9,7 @@ import org.moomoocow.tammy.model.StockHistoricalData;
 
 public interface Signal {
 
-  Action analyze(Date date, double open, double close, double high, double low, double mid, Accountant tm);
+  Action analyze(Date date, double open, double close, double high, double low, double mid, long vol, Accountant tm);
   
   Map<String,SortedMap<Date,Double>> getDisplayPoints();
 

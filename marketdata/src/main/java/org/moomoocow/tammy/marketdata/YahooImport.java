@@ -23,6 +23,7 @@ import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.moomoocow.tammy.model.Exchange;
+import org.moomoocow.tammy.model.ModelHelper;
 import org.moomoocow.tammy.model.Stock;
 import org.moomoocow.tammy.model.StockHistoricalData;
 import org.moomoocow.tammy.model.StockSnapshotData;
@@ -328,7 +329,7 @@ public class YahooImport {
 
     Calendar startDate = new GregorianCalendar();
 
-    StockHistoricalData lastDD = s.getMaxDatedDailyData();
+    StockHistoricalData lastDD = ModelHelper.getMaxDatedDailyData(s);
 
     startDate.setTime(lastDD == null ? new Date(0) : lastDD.getDate());
 
@@ -405,15 +406,6 @@ public class YahooImport {
       return;
     }
 
-    /*
-     * File format Date,Open,High,Low,Close,Volume,Adj Close
-     * 2013-01-03,3.34,3.35,3.33,3.35,13666000,3.35
-     * 2013-01-02,3.32,3.34,3.32,3.33,15587000,3.33
-     * 2013-01-01,3.30,3.30,3.30,3.30,000,3.30
-     * 2012-12-31,3.30,3.32,3.29,3.30,18787000,3.30
-     * 2012-12-28,3.31,3.33,3.31,3.33,11723000,3.33
-     */
-
     StockHistoricalData prevDD = null;
     Date lastHistoricalDate = null;
 
@@ -466,12 +458,28 @@ public class YahooImport {
       StockHistoricalData currDD = new StockHistoricalData(d, s, open, high,
           low, close, vol, adjustedClose, dividend);
 
-      // Date Open High Low Close Volume, Adj Close, C / Adj C, T+1 / T, Filter
-      // >, ABS(x-1)
-      // 5/12/2004 26.81 27.18 25.76 27.08 26108100 27.08 1.0000 2.000373692
-      // 2.000373692 1.00037
-      // 5/11/2004 52.35 54 52.18 53.53 34553400 26.76 0.4999 0.999813189
-      // 0.00019
+      /* NB... Latest rec is first!
+       * File format Date,Open,High,Low,Close,Volume,Adj Close
+       * 2013-01-03,3.34,3.35,3.33,3.35,13666000,3.35
+       * 2013-01-02,3.32,3.34,3.32,3.33,15587000,3.33
+       * 2013-01-01,3.30,3.30,3.30,3.30,000,3.30
+       * 2012-12-31,3.30,3.32,3.29,3.30,18787000,3.30
+       * 2012-12-28,3.31,3.33,3.31,3.33,11723000,3.33
+       */
+
+      
+      /*
+       * http://help.yahoo.com/kb/index?page=content&y=PROD_FIN&locale=en_US&id=SLN2311&pir=wDJ8S3FibUlXCBwZUE9vbtPeZbEjdxCBF1zXsumcsV2hgD_2wepLNWAZdyC_evrAzwg-
+        When importing from Yahoo, 
+        AdjustedClose is the REAL value of the day's close ASOF the date of imported of the latest record
+        It will includes any splits / dividends.
+        Let's say we import latest 100 records, we need make sure that they can co-exist with prev recs with adjclose.
+        Current way is for the new rec, divide each close with it's adjclose. 
+        And when looping from the latest record, divide the curr ratio with the prev one,
+        this multipler will give the change in value of the curr rec to the prev one. 
+        
+        To use, we will need to loop from the latest multipler and multiple prev ones to give prev 'PV'
+        */
 
       if (prevDD != null) {
         Double multipler = prevDD.getCloseMultipler()

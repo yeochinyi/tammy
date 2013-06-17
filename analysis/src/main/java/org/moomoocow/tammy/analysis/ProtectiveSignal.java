@@ -54,9 +54,9 @@ public class ProtectiveSignal extends AbstractChainedSignal {
   }
 
   @Override
-  public Action analyze(Date date, double open, double close, double high, double low, double mid, Accountant tm) {
+  public Action analyze(Date date, double open, double close, double high, double low, double mid, long vol, Accountant tm) {
   
-    Action chainedSignalAction = this.chainSignal != null ? this.chainSignal.analyze(date,open,close,high,low,mid,tm) : null;
+    Action chainedSignalAction = this.chainSignal != null ? this.chainSignal.analyze(date,open,close,high,low,mid,vol,tm) : null;
     
     if(tm.hasStock()){
       

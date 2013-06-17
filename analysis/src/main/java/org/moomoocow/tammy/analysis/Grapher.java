@@ -168,7 +168,7 @@ public class Grapher extends ApplicationFrame {
     
     int days = 200;
 
-    Simulator sim = new Simulator(s.get(0).getSortedDailyData(), days);      
+    Simulator sim = new Simulator(s.get(0), null);      
     int[] mas = {30, 14};
 
     Grapher g = new Grapher(args[0]);
