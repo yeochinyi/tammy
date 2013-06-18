@@ -9,9 +9,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.moomoocow.tammy.analysis.Accountant;
 import org.moomoocow.tammy.analysis.Deal.Action;
-import org.moomoocow.tammy.analysis.MAHLSignal;
-import org.moomoocow.tammy.analysis.ProtectiveSignal;
-import org.moomoocow.tammy.analysis.Signal;
+import org.moomoocow.tammy.analysis.signal.EnhancedProtective;
+import org.moomoocow.tammy.analysis.signal.MovingAverage;
+import org.moomoocow.tammy.analysis.signal.MinPeriod;
+import org.moomoocow.tammy.analysis.signal.Protective;
+import org.moomoocow.tammy.analysis.signal.Signal;
 
 public class TestSignals {
 
@@ -27,29 +29,39 @@ public class TestSignals {
   }
 
   @Test
-  public void testAnalyzeProtectiveSignal() {
-    Signal s = new ProtectiveSignal(null, 0.2, 0.2, 2);
+  public void testAnalyzeProtectiveSignal() {    
     a.buyAll(1.0, new GregorianCalendar(2013,0,3).getTime(), Action.BUY);
+    
+    Signal s = new Protective(0.2, true,null);
     assertEquals(Action.TAKEPROFIT,s.analyze(new GregorianCalendar(2013,0,14).getTime(),0.0,0.0,0.0,0.0,1.2,0,a));
     assertEquals(null,s.analyze(new GregorianCalendar(2013,0,14).getTime(),0.0,0.0,0.0,0.0,1.1,0,a));
+    
+    s = new Protective(0.2, false,null);
     assertEquals(Action.STOPLOSS,s.analyze(new GregorianCalendar(2013,0,14).getTime(),0.0,0.0,0.0,0.0,0.8,0,a));
     assertEquals(null,s.analyze(new GregorianCalendar(2013,0,14).getTime(),0.0,0.0,0.0,0.0,0.9,0,a));
     
+    s = new MinPeriod(3,null);
     assertEquals(null,s.analyze(new GregorianCalendar(2013,0,5).getTime(),0.0,0.0,0.0,0.0,1.2,0,a));
     assertEquals(null,s.analyze(new GregorianCalendar(2013,0,5).getTime(),0.0,0.0,0.0,0.0,0.8,0,a));
+        
+    s = new EnhancedProtective(0.3,0.1,null);
+    assertEquals(null,s.analyze(new GregorianCalendar(2013,0,14).getTime(),0.0,0.0,0.0,0.0,1.2,0,a));
+    assertEquals(null,s.analyze(new GregorianCalendar(2013,0,15).getTime(),0.0,0.0,0.0,0.0,2.0,0,a));
+    assertEquals(Action.TAKEPROFIT,s.analyze(new GregorianCalendar(2013,0,16).getTime(),0.0,0.0,0.0,0.0,1.8,0,a));
+
   }
   
   @Test
   public void testAnalyzeMASignal() {
     int[] mas = {1,2};
-    Signal s = new MAHLSignal(mas,true);
+    Signal s = new MovingAverage(mas,true);
     int dateCount = 1;
     assertEquals(null,s.analyze(new GregorianCalendar(2013,0,dateCount++).getTime(),0.0,0.0,0.0,0.0,1.0,0,a));
     assertEquals(null,s.analyze(new GregorianCalendar(2013,0,dateCount++).getTime(),0.0,0.0,0.0,0.0,2.0,0,a));
     assertEquals(Action.SELL,s.analyze(new GregorianCalendar(2013,0,dateCount++).getTime(),0.0,0.0,0.0,0.0,1.0,0,a));
     assertEquals(Action.BUY,s.analyze(new GregorianCalendar(2013,0,dateCount++).getTime(),0.0,0.0,0.0,0.0,2.0,0,a));
     
-    s = new MAHLSignal(mas,false);
+    s = new MovingAverage(mas,false);
     assertEquals(null,s.analyze(new GregorianCalendar(2013,0,dateCount++).getTime(),0.0,0.0,0.0,0.0,1.0,0,a));
     assertEquals(null,s.analyze(new GregorianCalendar(2013,0,dateCount++).getTime(),0.0,0.0,0.0,0.0,2.0,0,a));
     assertEquals(Action.BUY,s.analyze(new GregorianCalendar(2013,0,dateCount++).getTime(),0.0,0.0,0.0,0.0,1.0,0,a));

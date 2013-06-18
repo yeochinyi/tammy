@@ -13,6 +13,7 @@ import org.moomoocow.tammy.analysis.Deal.Action;
 
 public class Accountant {
   
+  @SuppressWarnings("unused")
   private static Logger log = Logger.getLogger(Accountant.class);
   
   private final double initialCash;

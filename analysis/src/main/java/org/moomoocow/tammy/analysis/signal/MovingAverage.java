@@ -1,4 +1,4 @@
-package org.moomoocow.tammy.analysis;
+package org.moomoocow.tammy.analysis.signal;
 
 import java.util.Comparator;
 import java.util.Date;
@@ -8,11 +8,24 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.moomoocow.tammy.analysis.Accountant;
 import org.moomoocow.tammy.analysis.Deal.Action;
+import org.moomoocow.tammy.analysis.MA;
 
-public class MAHLSignal implements Signal {
+public class MovingAverage extends AbstractChainedSignal {
   
-  private static Logger log = Logger.getLogger(MAHLSignal.class);
+  
+  public static MovingAverage getRandom(Signal s){
+    int[] i = { 
+        (int) (Math.random() * 11.0 + 3),
+        (int) (Math.random() * 60.0 + 15),
+        
+    };
+    return new MovingAverage(i, true);
+  }
+  
+  @SuppressWarnings("unused")
+  private static Logger log = Logger.getLogger(MovingAverage.class);
 
   private int[] maPeriods;
   private MA ma;
@@ -24,7 +37,7 @@ public class MAHLSignal implements Signal {
   
   private Map<String,SortedMap<Date,Double>> displayPoints;
 
-  public MAHLSignal(int[] maPeriods, boolean buyLongOverShort) {
+  public MovingAverage(int[] maPeriods, boolean buyLongOverShort) {
     this.maPeriods = maPeriods;
     this.ma = new MA();
     this.displayPoints = new HashMap<String,SortedMap<Date,Double>>();
@@ -45,7 +58,7 @@ public class MAHLSignal implements Signal {
   }
 
   @Override
-  public Action analyze(Date date, double open, double close, double high, double low, double mid,long vol, Accountant tm) {
+  public Action override(Action a,Date date, double open, double close, double high, double low, double mid,long vol, Accountant tm) {
     ma.add(mid);
 
     for (Integer i : maPeriods){ 
@@ -87,7 +100,7 @@ public class MAHLSignal implements Signal {
   }
   
   @Override
-  public String toString(){
+  public String chainedToString(){
     StringBuffer s = new StringBuffer("MAHLStrategy[");
     for (int i : this.maPeriods) {
       s.append(i).append(",");
