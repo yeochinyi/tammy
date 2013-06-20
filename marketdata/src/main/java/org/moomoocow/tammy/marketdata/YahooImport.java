@@ -11,6 +11,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -25,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.moomoocow.tammy.model.Exchange;
 import org.moomoocow.tammy.model.ModelHelper;
 import org.moomoocow.tammy.model.Stock;
+import org.moomoocow.tammy.model.StockGroup;
 import org.moomoocow.tammy.model.StockHistoricalData;
 import org.moomoocow.tammy.model.StockSnapshotData;
 import org.moomoocow.tammy.model.YahooData;
@@ -64,29 +66,31 @@ public class YahooImport {
     digitMultiplerMap.put("T", 4);
 
   }
-
+  
   @SuppressWarnings("unchecked")
-  public void importData(boolean importHistoricalData, String exchange){
+  public void importGroupData(boolean importHistoricalData, String group){
 
-    Query q = pm.newQuery(Exchange.class, "this.code == '" + exchange + "'");
+    Query q = pm.newQuery(StockGroup.class, "this.code == '" + group + "'");
 
-    List<Exchange> exchs = (List<Exchange>) q.execute();
-    if (exchs.size() == 0) {
-      logger.warn("No such exchange in db " + exchange);
+    List<StockGroup> groups = (List<StockGroup>) q.execute();
+    if (groups.size() == 0) {
+      logger.warn("No such group in db " + group);
       return;
     }
 
-    Exchange e = exchs.get(0);
+    StockGroup g = groups.get(0);
 
-    logger.info("importData for exchange " + e.getCode());
+    logger.info("importData for group " + g.getDescription());
 
-    Set<Stock> stocks = e.getActiveStocks();
+    List<Stock> stocks = g.getStocks();
 
-    // Query q = pm.newQuery(Stock.class, "this.code == 'Z74.SI'");
+    importStockData(q,importHistoricalData,stocks);
+
+  }
+  
+  private void importStockData(Query q, boolean importHistoricalData, Collection<Stock> stocks){
     q = pm.newQuery(Stock.class,
-        "(this.active == true || this.active == null) &&  ");
-
-    // logger.info("ImportAll for " + stocks.size() + " stocks.");
+        "(this.active == true || this.active == null) ");
 
     if (importHistoricalData) {
       for (Stock s : stocks) {
@@ -108,7 +112,26 @@ public class YahooImport {
       if (batch.size() > 0)
         importSnapshotData(batch);
     }
+  }
 
+  @SuppressWarnings("unchecked")
+  public void importData(boolean importHistoricalData, String exchange){
+
+    Query q = pm.newQuery(Exchange.class, "this.code == '" + exchange + "'");
+
+    List<Exchange> exchs = (List<Exchange>) q.execute();
+    if (exchs.size() == 0) {
+      logger.warn("No such exchange in db " + exchange);
+      return;
+    }
+
+    Exchange e = exchs.get(0);
+
+    logger.info("importData for exchange " + e.getCode());
+
+    Set<Stock> stocks = e.getStocks();
+
+    importStockData(q,importHistoricalData,stocks);
   }
 
   private void importSnapshotData(List<Stock> stocks) {

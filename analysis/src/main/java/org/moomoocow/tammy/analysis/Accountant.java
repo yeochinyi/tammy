@@ -4,7 +4,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
@@ -143,12 +145,17 @@ public class Accountant {
   
   @Override
   public String toString(){
+    
+    Map<Action,Integer> m = new HashMap<Action,Integer>();
+                
     StringBuilder sb = new StringBuilder("Num:" + transactions.size()  + " --> ");
     for (Deal d : transactions) {
+      Integer i = m.get(d.getReason());
+      m.put(d.getReason(), i == null ? 1 : ++i);
       sb.append(d).append(",");
     }
     
-    return sb.toString();
+    return sb.toString() + ",Actions:" +  m.toString();
   }
   
   

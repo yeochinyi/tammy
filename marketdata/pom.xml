@@ -52,10 +52,10 @@
 					<mainClass>org.moomoocow.tammy.marketdata.Main</mainClass>
 					<arguments>
 					</arguments>
-					<systemProperties>
+					<!-- systemProperties>
 						<systemProperty>
 						</systemProperty>
-					</systemProperties>
+					</systemProperties -->
 				</configuration>
 			</plugin>
 		</plugins>

@@ -21,6 +21,7 @@ public class Main {
     options.addOption("e", false, "make (e)xchanges");
     options.addOption("s", false, "make (s)tocks");
     options.addOption("d", true, "make (d)ata for [exchange_name]");
+    options.addOption("g", true, "make (g)roup for [group_code]");
 
     try {
       CommandLine line = parser.parse(options, args, false);
@@ -52,6 +53,11 @@ public class Main {
     if(line.hasOption("d")){
       String exchange = line.getOptionValue("d");
       new YahooImport().importData(true, exchange);
+    }
+
+    if(line.hasOption("g")){
+      String group = line.getOptionValue("g");
+      new YahooImport().importGroupData(true, group);
     }
     
 

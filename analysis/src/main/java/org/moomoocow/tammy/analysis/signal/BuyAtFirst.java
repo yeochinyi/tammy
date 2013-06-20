@@ -25,6 +25,6 @@ public class BuyAtFirst extends AbstractChainedSignal {
 
   @Override
   public String chainedToString() {
-    return "BuyAndHold";
+    return "BuyAndHold=>" + super.chainedToString();
   }
 }

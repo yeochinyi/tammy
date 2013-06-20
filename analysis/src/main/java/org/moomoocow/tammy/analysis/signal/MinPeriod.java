@@ -30,7 +30,7 @@ public class MinPeriod extends AbstractChainedSignal {
   @Override
   public String chainedToString() {
     return "MinPeriod [minPeriod=" + minPeriod
-        + "]";
+        + "]=>" + super.chainedToString();
   }
   
   

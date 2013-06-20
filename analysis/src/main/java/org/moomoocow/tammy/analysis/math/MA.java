@@ -1,14 +1,11 @@
-package org.moomoocow.tammy.analysis;
+package org.moomoocow.tammy.analysis.math;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MA {
-
-  public final static void main(String[] args) {
-    MA ta = new MA();
-    System.out.println(ta.add(1.0).add(2.0).add(3.0).getMA(2));
-  }
 
   private List<Double> data;
 
@@ -34,7 +31,10 @@ public class MA {
       total += data.get(i - 1);
     }
 
-    return total / span;
+    double r = new BigDecimal(total).divide(new BigDecimal(span), 2,
+        RoundingMode.HALF_EVEN).doubleValue();
+    
+    return r;
 
   }
 

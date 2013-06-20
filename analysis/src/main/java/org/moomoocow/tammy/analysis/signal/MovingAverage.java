@@ -10,7 +10,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.moomoocow.tammy.analysis.Accountant;
 import org.moomoocow.tammy.analysis.Deal.Action;
-import org.moomoocow.tammy.analysis.MA;
+import org.moomoocow.tammy.analysis.math.MA;
 
 public class MovingAverage extends AbstractChainedSignal {
   
@@ -105,7 +105,7 @@ public class MovingAverage extends AbstractChainedSignal {
     for (int i : this.maPeriods) {
       s.append(i).append(",");
     }
-    s.append("buyLongOverShort=").append(buyLongOverShort).append("]");
+    s.append("buyLongOverShort=").append(buyLongOverShort).append("]=>" + super.chainedToString());
     return  s.toString();
   }
 

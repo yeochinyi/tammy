@@ -45,7 +45,7 @@ public class EnhancedProtective extends Protective {
         top = mid;
       else{
         double percentDropFromTop = new BigDecimal(top - mid).divide(new BigDecimal(top),2,RoundingMode.HALF_EVEN).doubleValue();
-        if (percentDropFromTop  >= dropPercentAction){      
+        if (percentDropFromTop  >= dropPercentAction){
           reset();
           return Action.TAKEPROFIT;
         }

@@ -10,12 +10,12 @@ import org.moomoocow.tammy.analysis.Deal.Action;
 public class Protective extends AbstractChainedSignal {
 
   public static Protective getRandomTakeProfit(Signal s){
-    double greaterThan = Math.random() * 0.35 + 0.05;
+    double greaterThan = Math.random() * 0.25 + 0.05;
     return new Protective(greaterThan,s);
   }
   
   public static Protective getRandomStopLoss(Signal s){
-    double greaterThan = Math.random() * 0.1 + 0.05;
+    double greaterThan = Math.random() * 0.07 + 0.03;
     return new Protective(greaterThan,false,s);
   }
 
@@ -55,7 +55,7 @@ public class Protective extends AbstractChainedSignal {
   @Override
   public String chainedToString() {
     return "ProtectiveSignal [greaterThan=" + greaterThan
-        + ", isTakeProfit=" + isTakeProfit + "]";
+        + ", isTakeProfit=" + isTakeProfit + "]=>" + super.chainedToString();
   }
 
 }

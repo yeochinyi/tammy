@@ -1,6 +1,5 @@
 package org.moomoocow.tammy.model;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.jdo.annotations.PersistenceCapable;
@@ -19,26 +18,13 @@ public class Exchange extends BaseStaticData {
 
   public Exchange(String code, String desc) {
     super(code, desc);
-
-    this.stocks = new HashSet<Stock>();
+    //this.stocks = new HashSet<Stock>();
   }
 
   public Set<Stock> getStocks() {
     return stocks;
   }
   
-  public Set<Stock> getActiveStocks() {
-    Set<Stock> set = getStocks();
-    for (Stock s : set) {
-      if(Boolean.TRUE.equals(s.getActive())){
-        set.remove(s);
-      }          
-    }
-    
-    return set;
-  }
- 
-
   public void setStocks(Set<Stock> stocks) {
     this.stocks = stocks;
   }

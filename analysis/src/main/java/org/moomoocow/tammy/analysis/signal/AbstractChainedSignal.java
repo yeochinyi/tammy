@@ -23,7 +23,7 @@ public abstract class AbstractChainedSignal implements Signal {
     this.chainSignal = chainSignal;
   }
 
-  public abstract String chainedToString();
+  //public abstract String chainedToString();
 
   
   public abstract Action override(Action a, Date date, double open,
@@ -51,6 +51,10 @@ public abstract class AbstractChainedSignal implements Signal {
   
   public String toString(){
     return this.chainedToString()  + (chainSignal != null ? "+=+" + chainSignal.toString() : "");
+  }
+  
+  public String chainedToString() {
+    return "AbstractChainedSignal [triggered=" + overriddenMap.size() + "]";
   }
 
 }
