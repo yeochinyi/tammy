@@ -10,22 +10,33 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.moomoocow.tammy.analysis.Accountant;
 import org.moomoocow.tammy.analysis.Deal.Action;
+import org.moomoocow.tammy.analysis.math.ExponentialMA;
 import org.moomoocow.tammy.analysis.math.MA;
+import org.moomoocow.tammy.analysis.math.SimpleMA;
 
-public class MovingAverage extends AbstractChainedSignal {
+public class MACrosser extends AbstractChainedSignal {
   
   
-  public static MovingAverage getRandom(Signal s){
+  public static MACrosser getRandomSMA(Signal s){
     int[] i = { 
         (int) (Math.random() * 11.0 + 3),
         (int) (Math.random() * 60.0 + 15),
         
     };
-    return new MovingAverage(i, true);
+    return new MACrosser(i, true,true);
+  }
+  
+  public static MACrosser getRandomEMA(Signal s){
+    int[] i = { 
+        (int) (Math.random() * 11.0 + 3),
+        (int) (Math.random() * 60.0 + 15),
+        
+    };
+    return new MACrosser(i, true,false);
   }
   
   @SuppressWarnings("unused")
-  private static Logger log = Logger.getLogger(MovingAverage.class);
+  private static Logger log = Logger.getLogger(MACrosser.class);
 
   private int[] maPeriods;
   private MA ma;
@@ -37,9 +48,9 @@ public class MovingAverage extends AbstractChainedSignal {
   
   private Map<String,SortedMap<Date,Double>> displayPoints;
 
-  public MovingAverage(int[] maPeriods, boolean buyLongOverShort) {
+  public MACrosser(int[] maPeriods, boolean buyLongOverShort, boolean isSimpleMA) {
     this.maPeriods = maPeriods;
-    this.ma = new MA();
+    this.ma = isSimpleMA ? new SimpleMA(maPeriods) : new ExponentialMA(maPeriods);
     this.displayPoints = new HashMap<String,SortedMap<Date,Double>>();
     this.buyLongOverShort = buyLongOverShort ? 1 : 0;
     shortestMaPeriod = Integer.MAX_VALUE;

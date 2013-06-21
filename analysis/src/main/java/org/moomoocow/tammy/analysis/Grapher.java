@@ -38,7 +38,7 @@ import org.jfree.ui.RectangleAnchor;
 import org.jfree.ui.RefineryUtilities;
 import org.jfree.ui.TextAnchor;
 import org.moomoocow.tammy.analysis.signal.MinPeriod;
-import org.moomoocow.tammy.analysis.signal.MovingAverage;
+import org.moomoocow.tammy.analysis.signal.MACrosser;
 import org.moomoocow.tammy.analysis.signal.Protective;
 import org.moomoocow.tammy.analysis.signal.Signal;
 import org.moomoocow.tammy.model.Stock;
@@ -141,7 +141,7 @@ public class Grapher extends ApplicationFrame {
 
     Date lastBuyDate = null;
 
-    for (Deal t : sim.getActionsMap().get(strategy).getTransactions()) {
+    for (Deal t : sim.getAccountantMap().get(strategy).getDeals()) {
       if (t.isBuy()) {
         lastBuyDate = t.getDate();
         localXYPlot.addAnnotation(addPointerAnno(t));
@@ -170,7 +170,7 @@ public class Grapher extends ApplicationFrame {
 
   private XYPointerAnnotation addPointerAnno(Deal t) {
     XYPointerAnnotation localXYPointerAnnotation = new XYPointerAnnotation(
-        t.toString(), new Day(t.getDate()).getFirstMillisecond(), t.getPrice(),
+        t.toString(), new Day(t.getDate()).getFirstMillisecond(), t.getUnitPrice(),
         2.356194490192345D);
     localXYPointerAnnotation.setBaseRadius(10.0D);
     localXYPointerAnnotation.setTipRadius(0.0D);
@@ -194,7 +194,7 @@ public class Grapher extends ApplicationFrame {
     Grapher g = new Grapher(args[0]);
 
     g.draw(sim, new MinPeriod(3, new Protective(0.2, new Protective(0.1, false,
-        new MovingAverage(mas, true)))));
+        new MACrosser(mas, true,true)))));
     g.pack();
     RefineryUtilities.centerFrameOnScreen(g);
     g.setVisible(true);

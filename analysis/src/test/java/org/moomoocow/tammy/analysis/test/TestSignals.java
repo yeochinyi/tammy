@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.moomoocow.tammy.analysis.Accountant;
 import org.moomoocow.tammy.analysis.Deal.Action;
 import org.moomoocow.tammy.analysis.signal.EnhancedProtective;
-import org.moomoocow.tammy.analysis.signal.MovingAverage;
+import org.moomoocow.tammy.analysis.signal.MACrosser;
 import org.moomoocow.tammy.analysis.signal.MinPeriod;
 import org.moomoocow.tammy.analysis.signal.Protective;
 import org.moomoocow.tammy.analysis.signal.Signal;
@@ -54,14 +54,14 @@ public class TestSignals {
   @Test
   public void testAnalyzeMASignal() {
     int[] mas = {1,2};
-    Signal s = new MovingAverage(mas,true);
+    Signal s = new MACrosser(mas,true,true);
     int dateCount = 1;
     assertEquals(null,s.analyze(new GregorianCalendar(2013,0,dateCount++).getTime(),0.0,0.0,0.0,0.0,1.0,0,a));
     assertEquals(null,s.analyze(new GregorianCalendar(2013,0,dateCount++).getTime(),0.0,0.0,0.0,0.0,2.0,0,a));
     assertEquals(Action.SELL,s.analyze(new GregorianCalendar(2013,0,dateCount++).getTime(),0.0,0.0,0.0,0.0,1.0,0,a));
     assertEquals(Action.BUY,s.analyze(new GregorianCalendar(2013,0,dateCount++).getTime(),0.0,0.0,0.0,0.0,2.0,0,a));
     
-    s = new MovingAverage(mas,false);
+    s = new MACrosser(mas,false,true);
     assertEquals(null,s.analyze(new GregorianCalendar(2013,0,dateCount++).getTime(),0.0,0.0,0.0,0.0,1.0,0,a));
     assertEquals(null,s.analyze(new GregorianCalendar(2013,0,dateCount++).getTime(),0.0,0.0,0.0,0.0,2.0,0,a));
     assertEquals(Action.BUY,s.analyze(new GregorianCalendar(2013,0,dateCount++).getTime(),0.0,0.0,0.0,0.0,1.0,0,a));

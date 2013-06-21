@@ -51,8 +51,8 @@ public class TestAccountant {
   @Test
   public void testGetPnlSinceLastTransaction() {   
     dm.buyAll(1.0, new Date(), Action.BUY);
-    assertEquals(0.1,dm.getPnlSinceLastTransaction(1.1),0.0);
-    assertEquals(-0.1,dm.getPnlSinceLastTransaction(0.9),0.0);
+    assertEquals(0.1,dm.getRealPnlSinceLastTran(1.1),0.0);
+    assertEquals(-0.1,dm.getRealPnlSinceLastTran(0.9),0.0);
   }
   
 

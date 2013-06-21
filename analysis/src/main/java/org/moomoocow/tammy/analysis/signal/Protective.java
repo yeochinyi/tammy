@@ -42,7 +42,7 @@ public class Protective extends AbstractChainedSignal {
       double high, double low, double mid, long vol, Accountant tm) {
 
     if (tm.hasStock()) {
-      double pnl = tm.getPnlSinceLastTransaction(mid);
+      double pnl = tm.getRealPnlSinceLastTran(mid);
       double m = isTakeProfit ? 1.0 : -1.0;
       if (greaterThan > 0.0 && (pnl * m) >= greaterThan) {
         return isTakeProfit ? Deal.Action.TAKEPROFIT : Deal.Action.STOPLOSS;

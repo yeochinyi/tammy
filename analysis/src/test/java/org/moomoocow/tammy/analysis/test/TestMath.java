@@ -5,7 +5,9 @@ import junit.framework.Assert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.moomoocow.tammy.analysis.math.ExponentialMA;
 import org.moomoocow.tammy.analysis.math.MA;
+import org.moomoocow.tammy.analysis.math.SimpleMA;
 
 public class TestMath {
 
@@ -21,7 +23,8 @@ public class TestMath {
   
   @Test
   public void testMA() {
-    MA ma = new MA().add(1.0).add(2.0).add(3.0);
+    int[] i = {1,2,3};
+    MA ma = new SimpleMA(i).add(1.0).add(2.0).add(3.0);
     Assert.assertEquals(3.0, ma.getMA(1));
     Assert.assertEquals(2.5, ma.getMA(2));
     Assert.assertEquals(2.0, ma.getMA(3));
@@ -29,15 +32,10 @@ public class TestMath {
   
   @Test
   public void testEMA() {
-    
-    double d = 0.0;
-    double f = 1.0 - (2.0 / 21.0);
-    for(int i=0; i<20;i++){
-      double v = (1.0 - f) * Math.pow(f, i);
-      d+=v;
-    }
-    
-    Assert.assertEquals(1.0, d);
+    int[] i = {1,2,3};
+    ExponentialMA ma = new ExponentialMA(i).add(1.0).add(2.0).add(3.0);
+    Assert.assertEquals(3.0, ma.getMA(1));
+    Assert.assertEquals(2.505, ma.getMA(2));
   }
 
   
