@@ -60,7 +60,7 @@ public class Grapher extends ApplicationFrame {
     TimeSeries volTimeSeries;
     List<TimeSeries> strategiesTimeSeries = new ArrayList<TimeSeries>();
 
-    sim.execute(strategy,null);
+    //sim.execute(strategy,null);
 
     final OHLCSeries localOHLCSeries = new OHLCSeries("main");
     localOHLCSeriesCollection.addSeries(localOHLCSeries);
@@ -141,6 +141,7 @@ public class Grapher extends ApplicationFrame {
 
     Date lastBuyDate = null;
 
+    /*
     for (Deal t : sim.getAccountantMap().get(strategy).getDeals()) {
       if (t.isBuy()) {
         lastBuyDate = t.getDate();
@@ -158,7 +159,7 @@ public class Grapher extends ApplicationFrame {
         localXYPlot.addDomainMarker(localIntervalMarker, Layer.BACKGROUND);
         localXYPlot.addAnnotation(addPointerAnno(t));
       }
-    }
+    }*/
 
     ChartUtilities.applyCurrentTheme(localJFreeChart);
     ChartPanel localChartPanel = new ChartPanel(localJFreeChart);

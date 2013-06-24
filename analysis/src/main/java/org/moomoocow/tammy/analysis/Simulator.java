@@ -26,14 +26,13 @@ import javax.jdo.Query;
 import org.apache.log4j.Logger;
 import org.moomoocow.tammy.analysis.signal.BuyAtFirst;
 import org.moomoocow.tammy.analysis.signal.EnhancedProtective;
-import org.moomoocow.tammy.analysis.signal.MinPeriod;
 import org.moomoocow.tammy.analysis.signal.MACrosser;
+import org.moomoocow.tammy.analysis.signal.MinPeriod;
 import org.moomoocow.tammy.analysis.signal.Protective;
 import org.moomoocow.tammy.analysis.signal.Signal;
 import org.moomoocow.tammy.model.ModelHelper;
 import org.moomoocow.tammy.model.Stock;
 import org.moomoocow.tammy.model.StockHistoricalData;
-import org.moomoocow.tammy.model.StockHistoricalData.Price;
 import org.moomoocow.tammy.model.util.Helper;
 
 /**
@@ -50,21 +49,15 @@ public class Simulator {
   
   private final static DateFormat df = new SimpleDateFormat("yyyy-mm-dd");
 
-  public List<StockHistoricalData> getSortedDailyData() {
-    return sortedDailyData;
-  }
-
-  private Map<Signal, Accountant> actionsMap;
-
-  public Map<Signal, Accountant> getAccountantMap() {
-    return actionsMap;
-  }
+  private Map<Signal, Accountant> accountantMap;
 
   private Map<Double, List<Signal>> pnlMap;
-
-  public Map<Double, List<Signal>> getPnlMap() {
-    return pnlMap;
-  }
+  
+  private Map<Signal, MtmManager> mtmMap;
+  
+  private final Stock stock;
+  
+  private Double benchmark; 
 
   @SuppressWarnings("unchecked")
   public static final void main(String args[]) throws ParseException {
@@ -76,11 +69,16 @@ public class Simulator {
     Date d = args.length > 1 ? df.parse(args[1]) : null ;
     
     Simulator sim = new Simulator(s.get(0), d);
-    double pnl = sim.execute(new BuyAtFirst(null),null).getRealPnl();
     
-    for(int i=0; i < 2000; i++){
+    sim.executeDefaultBenchMark();
+    
+    //for(int i=0; i < 100; i++){
+    int i = 0;
+    while(sim.accountantMap.size() < 2){
       sim.execute(new BuyAtFirst(
-          MinPeriod.getRandom(EnhancedProtective.getRandom(Protective.getRandomStopLoss(MACrosser.getRandomEMA(null))))),pnl);
+          MinPeriod.getRandom(EnhancedProtective.getRandom(Protective.getRandomStopLoss(MACrosser.getRandomEMA(null))))));
+      i++;
+      if(i % 1000 == 0) System.out.println("Counting " + i);
     }
     
     //int[] mas = { 21, 28 };
@@ -122,21 +120,20 @@ public class Simulator {
     
 
     
-    Map<Signal, Accountant> accountantMap = sim.getAccountantMap();
-
-    for (Entry<Double, List<Signal>> e : sim.getPnlMap().entrySet()) {     
+    for (Entry<Double, List<Signal>> e : sim.pnlMap.entrySet()) {
       System.out.println(e.getKey() + "-->");
       for (Signal st : e.getValue()) {
-        Accountant a = accountantMap.get(st);
         System.out.println("  " + st.toString() + "->"
-            + a);
+            + sim.mtmMap.get(st));
       }
     }
   }
 
   public Simulator(Stock s, Date date) {
 
-    this.actionsMap = new HashMap<Signal, Accountant>();
+    this.stock = s;
+    this.accountantMap = new HashMap<Signal, Accountant>();
+    this.mtmMap = new HashMap<Signal, MtmManager>();
     this.pnlMap = new TreeMap<Double, List<Signal>>(new Comparator<Double>() {
       @Override
       public int compare(Double o1, Double o2) {
@@ -150,24 +147,23 @@ public class Simulator {
         + this.sortedDailyData.size() + " recs.");
   }
 
-  private DateFormat yearMonthFormat = new SimpleDateFormat("yyyy-MM");
-  
-  private Map<String,Double> getMonthlyStockPrice(){
-    
-    Map<String,Double> m = new HashMap<String,Double>();
-    
-    for (StockHistoricalData h : this.sortedDailyData) {
-      String yM = yearMonthFormat.format(h.getDate());
-      if(!m.containsKey(yM))
-        m.put(yM, h.getAccX(Price.MID));
-    }
-    return m;
+
+  private int getMonth(Date d){
+    Calendar c = new GregorianCalendar();
+    c.setTime(d);
+    return c.get(Calendar.MONTH);
+
   }
   
+  public double executeDefaultBenchMark(){
+    this.benchmark = execute(new BuyAtFirst(null)).getTotalAnnualizedPnl();
+    return this.benchmark;
+  }
 
-  public Accountant execute(Signal signal, Double benchmark) {
+  public MtmManager execute(Signal signal) {
 
-    Accountant accountant = new Accountant(10000,0.004);
+    Accountant accountant = new Accountant(10000.0,0.004);
+    MtmManager mm = null;
         
     boolean firstTrans = true;
     Deal.Action r = null;
@@ -178,9 +174,13 @@ public class Simulator {
     double high = 0.0;
     double low = 0.0;
 
+    int lastMonth = -1;
+    
     for (StockHistoricalData h : this.sortedDailyData) {
       if (firstTrans) {
         firstTrans = false;
+        lastMonth = getMonth(h.getDate());
+        mm = new MtmManager(10000.0, h.getDate());
         continue;
       }
 
@@ -190,22 +190,30 @@ public class Simulator {
       high = h.getAccX(HIGH);
       low = h.getAccX(LOW);
       
-      // Buy
-      if (r == null){        
-      }      
-      
-      Deal d = accountant.transact(mid, h.getDate(), r);
+      if (r != null){
+        Deal d = accountant.transact(mid, h.getDate(), r);
+        if(d != null)
+          mm.add(d);
+      }
 
+      int currentMonth = getMonth(h.getDate());
+      if(currentMonth != lastMonth){
+        mm.commitMarkToMarket(h.getDate(), mid);
+        lastMonth = currentMonth;
+      }
+      
       r = signal.analyze(h.getDate(),open,close,high,low,mid,h.getVol(), accountant);
     }
 
-    this.actionsMap.put(signal, accountant);
-
-    //accountant.setLastStockPrice(mid);
-    Double pnl = accountant.getRealPnl();
+    Double pnl = mm.getTotalAnnualizedPnl();
     
-    if(benchmark == null || pnl > benchmark){
+    if((this.benchmark == null || pnl > this.benchmark)){
 
+      if(signal.isTriggeredAtLeast(1)){}
+      
+      this.accountantMap.put(signal, accountant);
+      this.mtmMap.put(signal, mm); 
+      
       List<Signal> s = pnlMap.get(pnl);
       if (s == null) {
         s = new ArrayList<Signal>();
@@ -213,9 +221,15 @@ public class Simulator {
       }
       s.add(signal);
     }
-
-    //System.out.println("PNL=" + String.format("%(,.2f", pnl));
-
-    return accountant;
+    return mm;
   }
+  
+  public List<StockHistoricalData> getSortedDailyData() {
+    return sortedDailyData;
+  }
+
+  public Stock getStock() {
+    return stock;
+  }
+
 }

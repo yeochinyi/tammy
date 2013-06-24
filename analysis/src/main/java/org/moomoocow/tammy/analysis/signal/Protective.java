@@ -57,5 +57,10 @@ public class Protective extends AbstractChainedSignal {
     return "ProtectiveSignal [greaterThan=" + greaterThan
         + ", isTakeProfit=" + isTakeProfit + "]=>" + super.chainedToString();
   }
+  
+  @Override
+  public boolean shouldNotBeChainedTriggered(){
+    return true;
+  }
 
 }

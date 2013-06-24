@@ -30,7 +30,7 @@ public class TestSignals {
 
   @Test
   public void testAnalyzeProtectiveSignal() {    
-    a.buyAll(1.0, new GregorianCalendar(2013,0,3).getTime(), Action.BUY);
+    a.transact(1.0, new GregorianCalendar(2013,0,3).getTime(), Action.BUY);
     
     Signal s = new Protective(0.2, true,null);
     assertEquals(Action.TAKEPROFIT,s.analyze(new GregorianCalendar(2013,0,14).getTime(),0.0,0.0,0.0,0.0,1.2,0,a));

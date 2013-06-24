@@ -91,18 +91,11 @@ public class MACrosser extends AbstractChainedSignal {
     
     this.lastAction = returnAction;
     
-    //if(log.isDebugEnabled()){
-    //  log.debug("maShort=" + maShort + ",maLong=" + maLong);
-    //}
-
     if(returnNull){
       return null;
     }
     
     return returnAction;
-    
-         
-    
   }
 
   @Override
@@ -118,6 +111,11 @@ public class MACrosser extends AbstractChainedSignal {
     }
     s.append("buyLongOverShort=").append(buyLongOverShort).append("]=>" + super.chainedToString());
     return  s.toString();
+  }
+  
+  @Override
+  public boolean shouldNotBeChainedTriggered(){
+    return false;
   }
 
 }

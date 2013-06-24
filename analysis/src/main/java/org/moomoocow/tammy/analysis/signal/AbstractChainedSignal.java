@@ -54,7 +54,17 @@ public abstract class AbstractChainedSignal implements Signal {
   }
   
   public String chainedToString() {
-    return "AbstractChainedSignal [triggered=" + overriddenMap.size() + "]";
+    return "Chained[triggered=" + overriddenMap.size() + "]";
+  }
+  
+  public boolean shouldNotBeChainedTriggered(){
+    return false;
+  }
+  
+  @Override
+  public boolean isTriggeredAtLeast(int times){
+    return (shouldNotBeChainedTriggered() ||  overriddenMap.size() >= times) 
+        && (chainSignal != null ? chainSignal.isTriggeredAtLeast(times) : true);
   }
 
 }

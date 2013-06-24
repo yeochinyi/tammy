@@ -16,7 +16,7 @@ public class Accountant {
   @SuppressWarnings("unused")
   private static Logger log = Logger.getLogger(Accountant.class);
 
-  private final double initialCash;
+  //private final double initialCash;
 
   private double cash;
    
@@ -25,20 +25,7 @@ public class Accountant {
   private final double commission;
 
   private List<Deal> deals;
-  
-  /*
-  public double getCash() {
-    return cash;
-  }
-
-  public long getStock() {
-    return stock;
-  }
-
-  public List<Deal> getDeals() {
-    return deals;
-  }*/
-
+   
   public int getPeriodAfterLastDealExclWeekends(Date date) {
     Deal transaction = getLastDeal();
     if (transaction == null)
@@ -65,11 +52,12 @@ public class Accountant {
    * @param commission percent where 1.0 is 100%
    */
   public Accountant(double initialCash, double commission) {
-    this.initialCash = initialCash;
+    //this.initialCash = initialCash;
     this.commission = commission;
     this.cash = initialCash;
     this.stock = 0;
-    //this.deals = new ArrayList<Deal>();
+    this.deals = new ArrayList<Deal>();
+
   }
   
   public Deal transact(Double price, Date date, Action r){
@@ -162,6 +150,14 @@ public class Accountant {
     double lastPrice = transaction.getUnitPrice();
     double pnl = MathHelper.divide(price - lastPrice, lastPrice);
     return pnl;
+  }
+
+  public double getCash() {
+    return cash;
+  }
+
+  public long getStock() {
+    return stock;
   }
 
   @Override

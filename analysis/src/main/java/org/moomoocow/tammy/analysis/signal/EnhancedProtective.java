@@ -66,5 +66,7 @@ public class EnhancedProtective extends Protective {
     return "EnhancedProtective [dropPercentAction=" + dropPercentAction + "]=>" + super.chainedToString();
   }
   
+
+  
   
 }
