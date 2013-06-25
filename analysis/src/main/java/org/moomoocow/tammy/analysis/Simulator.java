@@ -66,6 +66,9 @@ public class Simulator {
   @SuppressWarnings("unchecked")
   public static final void main(String args[]) throws ParseException {
 
+	  System.out.println("TEST");
+	  
+	  
     PersistenceManager pm = Helper.SINGLETON.getPersistenceManager();
     Query q = pm.newQuery(Stock.class, "this.code == '" + args[0] + "'");
     List<Stock> s = (List<Stock>) q.execute();
@@ -77,7 +80,10 @@ public class Simulator {
     
     for(int i=0; i < 2000; i++){
       sim.execute(new BuyAtFirst(
-          MinPeriod.getRandom(EnhancedProtective.getRandom(Protective.getRandomStopLoss(MovingAverage.getRandom(null))))),pnl);      
+          MinPeriod.getRandom(EnhancedProtective.getRandom(Protective.getRandomStopLoss(MovingAverage.getRandom(null))))),pnl);
+    //int[] mas = { 11, 64 };
+      //sim.execute(new BuyAtFirst(new MinPeriod(3,new EnhancedProtective(0.35, 0.02,new Protective(0.05,false,new MovingAverage(mas, true))))),pnl);
+
     }
     
     //int[] mas = { 21, 28 };
@@ -117,7 +123,7 @@ public class Simulator {
       }
     }*/
     
-
+System.out.println("Finished execute");
     
     Map<Signal, Accountant> actionsMap2 = sim.getActionsMap();
 

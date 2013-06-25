@@ -33,8 +33,6 @@
 					<arguments>
 						<argument>-g</argument>
 					</arguments>
-					<systemProperties>
-					</systemProperties>
 				</configuration>
 			</plugin>		
 		</plugins>

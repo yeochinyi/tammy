@@ -30,14 +30,7 @@ public class TestMath {
   @Test
   public void testEMA() {
     
-    double d = 0.0;
-    double f = 1.0 - (2.0 / 21.0);
-    for(int i=0; i<20;i++){
-      double v = (1.0 - f) * Math.pow(f, i);
-      d+=v;
-    }
-    
-    Assert.assertEquals(1.0, d);
+
   }
 
   

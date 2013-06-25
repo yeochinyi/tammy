@@ -15,7 +15,7 @@
 	</modules>
 
 	<profiles>
-		<profile>
+		<!-- profile>
 			<id>default</id>
 			<properties>
 				<env>mysql_dev</env>
@@ -23,7 +23,7 @@
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>		
-		</profile>
+		</profile -->
 	</profiles>
 
 	<build>
