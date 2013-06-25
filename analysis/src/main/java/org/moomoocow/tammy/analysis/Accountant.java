@@ -26,10 +26,10 @@ public class Accountant {
 
   private List<Deal> deals;
    
-  public int getPeriodAfterLastDealExclWeekends(Date date) {
+  public Integer getPeriodAfterLastDealExclWeekends(Date date) {
     Deal transaction = getLastDeal();
     if (transaction == null)
-      return 0;
+      return null;
 
     DateTime begin = new DateTime(transaction.getDate());
     DateTime end = new DateTime(date);

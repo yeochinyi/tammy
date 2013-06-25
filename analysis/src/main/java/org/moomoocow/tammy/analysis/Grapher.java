@@ -195,7 +195,7 @@ public class Grapher extends ApplicationFrame {
     Grapher g = new Grapher(args[0]);
 
     g.draw(sim, new MinPeriod(3, new Protective(0.2, new Protective(0.1, false,
-        new MACrosser(mas, true,true)))));
+        new MACrosser(mas, true)))));
     g.pack();
     RefineryUtilities.centerFrameOnScreen(g);
     g.setVisible(true);

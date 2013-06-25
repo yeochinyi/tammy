@@ -23,7 +23,7 @@ public class MACrosser extends AbstractChainedSignal {
         (int) (Math.random() * 60.0 + 15),
         
     };
-    return new MACrosser(i, true,true);
+    return new MACrosser(i, true);
   }
   
   public static MACrosser getRandomEMA(Signal s){
@@ -32,7 +32,7 @@ public class MACrosser extends AbstractChainedSignal {
         (int) (Math.random() * 60.0 + 15),
         
     };
-    return new MACrosser(i, true,false);
+    return new MACrosser(i, false);
   }
   
   @SuppressWarnings("unused")
@@ -42,17 +42,16 @@ public class MACrosser extends AbstractChainedSignal {
   private MA ma;
   private int shortestMaPeriod;
   private int longestMaPeriod;
-  private int buyLongOverShort;
+  private boolean buyWhenShortOverLong;
   
   private Action lastAction = null;
   
   private Map<String,SortedMap<Date,Double>> displayPoints;
 
-  public MACrosser(int[] maPeriods, boolean buyLongOverShort, boolean isSimpleMA) {
+  public MACrosser(int[] maPeriods, boolean isSimpleMA) {
     this.maPeriods = maPeriods;
     this.ma = isSimpleMA ? new SimpleMA(maPeriods) : new ExponentialMA(maPeriods);
     this.displayPoints = new HashMap<String,SortedMap<Date,Double>>();
-    this.buyLongOverShort = buyLongOverShort ? 1 : 0;
     shortestMaPeriod = Integer.MAX_VALUE;
     longestMaPeriod = 0;
     for (Integer i : maPeriods) {
@@ -83,11 +82,9 @@ public class MACrosser extends AbstractChainedSignal {
     
     if(maShort.equals(maLong)) return null;
         
-    int maBit = maLong > maShort ? 1 : 0;
+    Action returnAction = maShort > maLong ? Action.BUY : Action.SELL;
         
-    Action returnAction = (maBit ^ buyLongOverShort) > 0 ? Action.BUY : Action.SELL;
-    
-    boolean returnNull  = returnAction.equals(lastAction) || lastAction == null;
+    boolean returnNull  = returnAction.equals(lastAction);
     
     this.lastAction = returnAction;
     
@@ -109,13 +106,13 @@ public class MACrosser extends AbstractChainedSignal {
     for (int i : this.maPeriods) {
       s.append(i).append(",");
     }
-    s.append("buyLongOverShort=").append(buyLongOverShort).append("]=>" + super.chainedToString());
+    s.append("buyLongOverShort=").append(buyWhenShortOverLong).append("]=>" + super.chainedToString());
     return  s.toString();
   }
   
   @Override
   public boolean shouldNotBeChainedTriggered(){
-    return false;
+    return true;
   }
 
 }

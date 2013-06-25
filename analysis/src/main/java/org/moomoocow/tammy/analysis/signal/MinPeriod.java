@@ -20,9 +20,13 @@ public class MinPeriod extends AbstractChainedSignal {
 
   @Override
   public Action override(Action a, Date date, double open, double close, double high,
-      double low, double mid, long vol, Accountant tm) {
-    if(minPeriod > 0 && tm.getPeriodAfterLastDealExclWeekends(date) <= minPeriod)
-      return null;
+      double low, double mid, long vol, Accountant tm) {   
+    if(minPeriod > 0 && tm != null){
+      Integer period = tm.getPeriodAfterLastDealExclWeekends(date);
+      if(period != null && period <= minPeriod)
+        return null;
+    }
+      
     
     return a;
   }

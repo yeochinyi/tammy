@@ -41,7 +41,7 @@ public class Protective extends AbstractChainedSignal {
   public Action override(Action a, Date date, double open, double close,
       double high, double low, double mid, long vol, Accountant tm) {
 
-    if (tm.hasStock()) {
+    if (tm != null && tm.hasStock()) {
       double pnl = tm.getRealPnlSinceLastTran(mid);
       double m = isTakeProfit ? 1.0 : -1.0;
       if (greaterThan > 0.0 && (pnl * m) >= greaterThan) {
@@ -58,9 +58,5 @@ public class Protective extends AbstractChainedSignal {
         + ", isTakeProfit=" + isTakeProfit + "]=>" + super.chainedToString();
   }
   
-  @Override
-  public boolean shouldNotBeChainedTriggered(){
-    return true;
-  }
 
 }

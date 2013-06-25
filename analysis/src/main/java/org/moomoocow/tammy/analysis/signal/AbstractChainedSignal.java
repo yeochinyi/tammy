@@ -36,7 +36,8 @@ public abstract class AbstractChainedSignal implements Signal {
         open, close, high, low, mid, vol, tm) : null;
     Action override = this.override(original, date, open, close, high, low,
         mid, vol, tm);
-    if (original != null && !original.equals(override)) {
+    if ((original != null && !original.equals(override)) || 
+        (override != null && !override.equals(original))) {
       Action[] as = { original, override };
       this.overriddenMap.put(date, as);
     }
@@ -63,8 +64,11 @@ public abstract class AbstractChainedSignal implements Signal {
   
   @Override
   public boolean isTriggeredAtLeast(int times){
-    return (shouldNotBeChainedTriggered() ||  overriddenMap.size() >= times) 
-        && (chainSignal != null ? chainSignal.isTriggeredAtLeast(times) : true);
+    boolean shouldNotBeChainedTriggered = shouldNotBeChainedTriggered();
+    int size = overriddenMap.size();
+    boolean chain = chainSignal != null ? chainSignal.isTriggeredAtLeast(times) : true;
+    return (shouldNotBeChainedTriggered || size  >= times) 
+        && chain;
   }
 
 }
