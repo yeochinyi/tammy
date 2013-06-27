@@ -5,7 +5,7 @@ import java.math.RoundingMode;
 import java.util.Date;
 
 import org.moomoocow.tammy.analysis.Accountant;
-import org.moomoocow.tammy.analysis.Deal.Action;
+import org.moomoocow.tammy.analysis.Action;
 
 public class EnhancedProtective extends Protective {
     
@@ -14,14 +14,14 @@ public class EnhancedProtective extends Protective {
   private double top;
   
   
-  public static EnhancedProtective getRandom(Signal s){
+  public static EnhancedProtective getRandom(AbstractChainedSignal s){
     double greaterThan = Math.random() * 0.35 + 0.05;
     double dropPercentAction = Math.random() * (greaterThan / 2.0);
     return new EnhancedProtective(greaterThan, dropPercentAction, s);
   }
 
 
-  public EnhancedProtective(double greaterThan, double dropPercentAction, Signal signal) {
+  public EnhancedProtective(double greaterThan, double dropPercentAction, AbstractChainedSignal signal) {
     super(greaterThan, signal);
     this.dropPercentAction = dropPercentAction;
     reset();

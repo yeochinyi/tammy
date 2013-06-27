@@ -9,7 +9,8 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.moomoocow.tammy.analysis.Accountant;
-import org.moomoocow.tammy.analysis.Deal.Action;
+import org.moomoocow.tammy.analysis.Action;
+import org.moomoocow.tammy.analysis.Action.ActionType;
 import org.moomoocow.tammy.analysis.math.ExponentialMA;
 import org.moomoocow.tammy.analysis.math.MA;
 import org.moomoocow.tammy.analysis.math.SimpleMA;
@@ -44,7 +45,7 @@ public class MACrosser extends AbstractChainedSignal {
   private int longestMaPeriod;
   private boolean buyWhenShortOverLong;
   
-  private Action lastAction = null;
+  private ActionType lastAction = null;
   
   private Map<String,SortedMap<Date,Double>> displayPoints;
 
@@ -63,7 +64,7 @@ public class MACrosser extends AbstractChainedSignal {
           return o1.compareTo(o2);
         }
       });
-      this.displayPoints.put(i.toString(), m);
+      this.displayPoints.put(MACrosser.class.getSimpleName() + "_" + i.toString(), m);
     }
   }
 
@@ -72,7 +73,7 @@ public class MACrosser extends AbstractChainedSignal {
     ma.add(mid);
 
     for (Integer i : maPeriods){ 
-      this.displayPoints.get(i.toString()).put(date, ma.getMA(i)); 
+      this.displayPoints.get(MACrosser.class.getSimpleName() + "_" + i.toString()).put(date, ma.getMA(i)); 
     }
     
     Double maShort = ma.getMA(shortestMaPeriod);
@@ -82,21 +83,25 @@ public class MACrosser extends AbstractChainedSignal {
     
     if(maShort.equals(maLong)) return null;
         
-    Action returnAction = maShort > maLong ? Action.BUY : Action.SELL;
-        
-    boolean returnNull  = returnAction.equals(lastAction);
+    //Action returnAction = maShort > maLong ? Action.BUY : Action.SELL;
     
-    this.lastAction = returnAction;
+    ActionType type = maShort > maLong ? ActionType.BUY : ActionType.SELL;
     
-    if(returnNull){
-      return null;
-    }
+    if(type.equals(lastAction)) return null;
     
-    return returnAction;
+   //boolean returnNull  = returnAction.equals(lastAction);
+    
+    this.lastAction = type;
+    
+    //if(returnNull){
+    //  return null;
+    //}
+    
+    return new Action(type,date,mid);
   }
 
   @Override
-  public Map<String,SortedMap<Date,Double>> getDisplayPoints() {
+  public Map<String,SortedMap<Date,Double>> getCombinedGraphPoints() {
     return displayPoints;
   }
   

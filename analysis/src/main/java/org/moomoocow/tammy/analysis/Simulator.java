@@ -72,11 +72,10 @@ public class Simulator {
     
     sim.executeDefaultBenchMark();
     
-    //for(int i=0; i < 100; i++){
-    int i = 0;
-    while(sim.accountantMap.size() < 2){
-      sim.execute(new BuyAtFirst(
-          MinPeriod.getRandom(EnhancedProtective.getRandom(Protective.getRandomStopLoss(MACrosser.getRandomEMA(null))))));
+    for(int i=0; i < 2000; i++){
+    //int i = 0;
+    //while(sim.accountantMap.size() < 2){
+      sim.execute(new BuyAtFirst(EnhancedProtective.getRandom(Protective.getRandomStopLoss(MACrosser.getRandomEMA(null)))));
       i++;
       if(i % 1000 == 0) System.out.println("Counting " + i);
     }
@@ -166,7 +165,7 @@ public class Simulator {
     MtmManager mm = null;
         
     boolean firstTrans = true;
-    Deal.Action r = null;
+    Action r = null;
 
     double mid = 0.0;
     double open = 0.0;

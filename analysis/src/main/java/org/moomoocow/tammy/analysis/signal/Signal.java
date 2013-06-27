@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.SortedMap;
 
 import org.moomoocow.tammy.analysis.Accountant;
-import org.moomoocow.tammy.analysis.Deal.Action;
+import org.moomoocow.tammy.analysis.Action;
 
 public interface Signal {
 
@@ -13,6 +13,8 @@ public interface Signal {
   
   boolean isTriggeredAtLeast(int times);
   
-  Map<String,SortedMap<Date,Double>> getDisplayPoints();
+  Map<String,SortedMap<Date,Double>> getGraphPoints();
+  
+  Map<String,Action> getActions();
 
 }

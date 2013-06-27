@@ -9,7 +9,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.moomoocow.tammy.analysis.Accountant;
-import org.moomoocow.tammy.analysis.Deal.Action;
+import org.moomoocow.tammy.analysis.Action;
 
 public class TestAccountant {
   

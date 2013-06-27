@@ -6,11 +6,11 @@ import java.util.Map;
 import java.util.SortedMap;
 
 import org.moomoocow.tammy.analysis.Accountant;
-import org.moomoocow.tammy.analysis.Deal.Action;
+import org.moomoocow.tammy.analysis.Action;
 
 public abstract class AbstractChainedSignal implements Signal {
 
-  private Signal chainSignal;
+  private AbstractChainedSignal chainSignal;
 
   private Map<Date, Action[]> overriddenMap;
 
@@ -18,13 +18,10 @@ public abstract class AbstractChainedSignal implements Signal {
     this(null);
   }
 
-  public AbstractChainedSignal(Signal chainSignal) {
+  public AbstractChainedSignal(AbstractChainedSignal chainSignal) {
     this.overriddenMap = new HashMap<Date, Action[]>();
     this.chainSignal = chainSignal;
   }
-
-  //public abstract String chainedToString();
-
   
   public abstract Action override(Action a, Date date, double open,
       double close, double high, double low, double mid, long vol, Accountant tm);
@@ -44,19 +41,49 @@ public abstract class AbstractChainedSignal implements Signal {
 
     return override;
   }
-
-  @Override
-  public Map<String, SortedMap<Date, Double>> getDisplayPoints() {
+  
+  public Map<String, SortedMap<Date, Double>> getCombinedGraphPoints(){
     return null;
   }
+  
+  @Override
+  public Map<String, SortedMap<Date, Double>> getGraphPoints() {
+    Map<String, SortedMap<Date, Double>> chained = (chainSignal != null ? chainSignal.getGraphPoints() : null);
+    Map<String, SortedMap<Date, Double>> current = getCombinedGraphPoints();
+    
+    if(chained != null){
+      if(current != null)
+        chained.putAll(current);
+      return chained;
+    }
+    return current;
+  }
+
+  public String chainedToString() {
+    return "Chained[triggered=" + overriddenMap.size() + "]";
+  }  
   
   public String toString(){
     return this.chainedToString()  + (chainSignal != null ? "+=+" + chainSignal.toString() : "");
   }
   
-  public String chainedToString() {
-    return "Chained[triggered=" + overriddenMap.size() + "]";
+  public Map<String,Action> getCombinedActions(){
+    return null;
   }
+  
+  @Override
+  public Map<String,Action> getActions(){
+    Map<String,Action> chained = (chainSignal != null ? chainSignal.getActions() : null);
+    Map<String,Action> current = getCombinedActions();
+    
+    if(chained != null){
+      if(current != null)
+        chained.putAll(current);
+      return chained;
+    }
+    return current;
+  }
+  
   
   public boolean shouldNotBeChainedTriggered(){
     return false;

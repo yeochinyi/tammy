@@ -60,7 +60,7 @@ public class Grapher extends ApplicationFrame {
     TimeSeries volTimeSeries;
     List<TimeSeries> strategiesTimeSeries = new ArrayList<TimeSeries>();
 
-    //sim.execute(strategy,null);
+    sim.execute(strategy);
 
     final OHLCSeries localOHLCSeries = new OHLCSeries("main");
     localOHLCSeriesCollection.addSeries(localOHLCSeries);
@@ -74,10 +74,9 @@ public class Grapher extends ApplicationFrame {
     }
 
     Map<String, SortedMap<Date, Double>> displayPoints = strategy
-        .getDisplayPoints();
+        .getGraphPoints();
     for (Entry<String, SortedMap<Date, Double>> e : displayPoints.entrySet()) {
-      TimeSeries ts = new TimeSeries(strategy.toString() + "(" + e.getKey()
-          + ")");
+      TimeSeries ts = new TimeSeries(e.getKey());
       strategiesTimeSeries.add(ts);
       for (Entry<Date, Double> e2 : e.getValue().entrySet()) {
         ts.add(new Day(e2.getKey()), e2.getValue());
@@ -142,7 +141,7 @@ public class Grapher extends ApplicationFrame {
     Date lastBuyDate = null;
 
     /*
-    for (Deal t : sim.getAccountantMap().get(strategy).getDeals()) {
+    for (Deal t : sim.get(strategy).getDeals()) {
       if (t.isBuy()) {
         lastBuyDate = t.getDate();
         localXYPlot.addAnnotation(addPointerAnno(t));

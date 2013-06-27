@@ -4,23 +4,6 @@ import java.util.Date;
 
 public class Deal {
   
-  public static enum Action { 
-    BUY(true), 
-    SELL(false), 
-    STOPLOSS(false), 
-    TAKEPROFIT(false);
-    
-    boolean isBuy;
-    
-    boolean isBuy(){
-      return isBuy;
-    }
-    
-    Action(boolean isBuy){
-      this.isBuy = isBuy;
-    }
-   }
-  
   private long qty;
   
   private double unitPrice;

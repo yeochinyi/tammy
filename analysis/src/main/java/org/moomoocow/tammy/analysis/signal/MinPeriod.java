@@ -3,17 +3,19 @@ package org.moomoocow.tammy.analysis.signal;
 import java.util.Date;
 
 import org.moomoocow.tammy.analysis.Accountant;
-import org.moomoocow.tammy.analysis.Deal.Action;
+import org.moomoocow.tammy.analysis.Action;
 
 public class MinPeriod extends AbstractChainedSignal {
 
   private final int minPeriod;
   
-  public static MinPeriod getRandom(Signal s){
+  private Action delayedAction;
+  
+  public static MinPeriod getRandom(AbstractChainedSignal s){
     return new MinPeriod((int) (Math.random() * 14.0), s);
   }
 
-  public MinPeriod(int minPeriod, Signal signal) {
+  public MinPeriod(int minPeriod, AbstractChainedSignal signal) {
     super(signal);
     this.minPeriod = minPeriod;
   }
@@ -23,10 +25,15 @@ public class MinPeriod extends AbstractChainedSignal {
       double low, double mid, long vol, Accountant tm) {   
     if(minPeriod > 0 && tm != null){
       Integer period = tm.getPeriodAfterLastDealExclWeekends(date);
-      if(period != null && period <= minPeriod)
+      if(period != null && period <= minPeriod){
+        if(a != null) delayedAction = a;
         return null;
+      }
+      else if(delayedAction != null){
+        delayedAction = null;
+        return delayedAction;
+      }
     }
-      
     
     return a;
   }

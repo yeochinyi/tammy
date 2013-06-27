@@ -7,8 +7,8 @@ import java.util.GregorianCalendar;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.moomoocow.tammy.analysis.Action;
 import org.moomoocow.tammy.analysis.Deal;
-import org.moomoocow.tammy.analysis.Deal.Action;
 import org.moomoocow.tammy.analysis.MtmManager;
 
 public class TestMtmManager {
