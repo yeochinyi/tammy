@@ -3,13 +3,14 @@ package org.moomoocow.tammy.analysis.signal;
 import java.util.Date;
 
 import org.moomoocow.tammy.analysis.Accountant;
-import org.moomoocow.tammy.analysis.Deal.Action;
+import org.moomoocow.tammy.analysis.Action;
+import org.moomoocow.tammy.analysis.Action.ActionType;
 
 public class BuyAtFirst extends AbstractChainedSignal {
 
   private boolean bought = false;
   
-  public BuyAtFirst(Signal s){
+  public BuyAtFirst(AbstractChainedSignal s){
     super(s);
   }
 
@@ -18,7 +19,7 @@ public class BuyAtFirst extends AbstractChainedSignal {
       double high, double low, double mid, long vol, Accountant tm) {
     if (!bought) {
       bought = true;
-      return Action.BUY;
+      return new Action(ActionType.BUY,date, mid);
     }
     return a;
   }

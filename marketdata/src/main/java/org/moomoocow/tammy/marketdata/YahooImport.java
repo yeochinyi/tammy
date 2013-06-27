@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.net.URL;
+import java.net.URLConnection;
 import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -42,6 +43,7 @@ public class YahooImport {
       Calendar.YEAR };
   final private static String DATE_START_PARAMS = "abc";
   final private static String DATE_END_PARAMS = "def";
+  final private static int URL_READ_TIMEOUT = 30000;
 
   final private static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -213,8 +215,9 @@ public class YahooImport {
 
     BufferedReader r = null;
     try {
-      r = new BufferedReader(new InputStreamReader(
-          new URL(url).openStream()));
+      URLConnection connect = new URL(url).openConnection();
+      connect.setReadTimeout(URL_READ_TIMEOUT);
+      r = new BufferedReader(new InputStreamReader(connect.getInputStream()));
     } catch (IOException e) {
       logger.warn("Can't get stock data",e);
     }
@@ -345,7 +348,7 @@ public class YahooImport {
     return map;
 
   }
-
+  
   public void importHistoricalData(Stock s) {
 
     logger.info(s.getDescription());
@@ -374,8 +377,10 @@ public class YahooImport {
     BufferedReader r = null;
 
     try {
-      r = new BufferedReader(new InputStreamReader(new URL(url).openStream()));
-      r.readLine();
+      URLConnection connect = new URL(url).openConnection();
+      connect.setReadTimeout(URL_READ_TIMEOUT);
+      r = new BufferedReader(new InputStreamReader(connect.getInputStream()));
+      r.readLine();//read heading
     } catch (Exception e) {
       logger.warn("Can't get dividend data",e);
     }
@@ -385,7 +390,6 @@ public class YahooImport {
     // Read heading
 
     while (true) {
-
       String text = null;
       try {
         text = r.readLine();
@@ -422,7 +426,9 @@ public class YahooImport {
     logger.info("Daily URL=" + url);
 
     try {
-      r = new BufferedReader(new InputStreamReader(new URL(url).openStream()));
+      URLConnection connect = new URL(url).openConnection();
+      connect.setReadTimeout(URL_READ_TIMEOUT);
+      r = new BufferedReader(new InputStreamReader(connect.getInputStream()));
       r.readLine();
     } catch (Exception e) {
       logger.warn("Can't get stock data",e);

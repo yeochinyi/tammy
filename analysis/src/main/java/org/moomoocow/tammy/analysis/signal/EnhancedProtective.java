@@ -3,7 +3,8 @@ package org.moomoocow.tammy.analysis.signal;
 import java.util.Date;
 
 import org.moomoocow.tammy.analysis.Accountant;
-import org.moomoocow.tammy.analysis.Deal.Action;
+import org.moomoocow.tammy.analysis.Action;
+import org.moomoocow.tammy.analysis.Action.ActionType;
 import org.moomoocow.tammy.analysis.MathHelper;
 
 public class EnhancedProtective extends Protective {
@@ -12,15 +13,14 @@ public class EnhancedProtective extends Protective {
   private boolean greaterThanIsReached;  
   private double top;
   
-  
-  public static EnhancedProtective getRandom(Signal s){
-    double greaterThan = MathHelper.randomDouble(0.05, 0.3);
-    double dropPercentAction = MathHelper.randomDouble(0.01, greaterThan); 
+  public static EnhancedProtective getRandom(AbstractChainedSignal s){
+    double greaterThan = Math.random() * 0.35 + 0.05;
+    double dropPercentAction = Math.random() * (greaterThan / 2.0);
     return new EnhancedProtective(greaterThan, dropPercentAction, s);
   }
 
 
-  public EnhancedProtective(double greaterThan, double dropPercentAction, Signal signal) {
+  public EnhancedProtective(double greaterThan, double dropPercentAction, AbstractChainedSignal signal) {
     super(greaterThan, signal);
     this.dropPercentAction = dropPercentAction;
     reset();
@@ -34,7 +34,7 @@ public class EnhancedProtective extends Protective {
     
     if(dropPercentAction < 0.0) return r;
     
-    if(Action.TAKEPROFIT.equals(r)){
+    if(ActionType.TAKEPROFIT.equals(r)){
       this.greaterThanIsReached = true;
     }
     
@@ -46,7 +46,7 @@ public class EnhancedProtective extends Protective {
         double percentDropFromTop =  MathHelper.divide(top - mid,top);
         if (percentDropFromTop  >= dropPercentAction){
           reset();
-          return Action.TAKEPROFIT;
+          return new Action(ActionType.TAKEPROFIT,date,mid);
         }
       }      
     }

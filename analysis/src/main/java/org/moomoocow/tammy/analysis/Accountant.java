@@ -9,7 +9,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
-import org.moomoocow.tammy.analysis.Deal.Action;
 
 public class Accountant {
 
@@ -61,7 +60,7 @@ public class Accountant {
   }
   
   public Deal transact(Double price, Date date, Action r){
-    if(r.isBuy){
+    if(r.isBuy()){
       return buyAll(price, date, r);
     }
     else

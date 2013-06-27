@@ -78,14 +78,15 @@ public class Simulator {
     for(int i=0; i < 2000; i++){
     //int i = 0;
     //while(sim.accountantMap.size() < 2){
+
     	//int[] mas = { 13, 39 };
     	//int[] mas = { 4, 69 };
         //sim.execute(new BuyAtFirst(new EnhancedProtective(0.22, 0.1,new Protective(0.04,false,new MACrosser(mas, true)))));
     //sim.execute(new BuyAtFirst(new MinPeriod(12,new EnhancedProtective(0.09, 0.04,new Protective(0.03,false,new MACrosser(mas, true))))));
       sim.execute(new BuyAtFirst(MinPeriod.getRandom(EnhancedProtective.getRandom(Protective.getRandomStopLoss(MACrosser.getRandomEMA(null))))));
       //sim.execute(new BuyAtFirst(EnhancedProtective.getRandom(Protective.getRandomStopLoss(MACrosser.getRandomEMA(null)))));
-      //i++;
-      //if(i % 1000 == 0) System.out.println("Counting " + i);
+      i++;
+      if(i % 1000 == 0) System.out.println("Counting " + i);
     }
     
     //int[] mas = { 21, 28 };
@@ -174,7 +175,7 @@ System.out.println("Finished execute");
     MtmManager mm = null;
         
     boolean firstTrans = true;
-    Deal.Action r = null;
+    Action r = null;
 
     double mid = 0.0;
     double open = 0.0;

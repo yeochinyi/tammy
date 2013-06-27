@@ -9,7 +9,6 @@ import java.util.Map;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
-import org.moomoocow.tammy.analysis.Deal.Action;
 
 public class MtmManager {
 
