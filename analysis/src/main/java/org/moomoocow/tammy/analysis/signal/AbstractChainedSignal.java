@@ -14,6 +14,8 @@ public abstract class AbstractChainedSignal implements Signal {
 
   private Map<Date, Action[]> overriddenMap;
 
+  protected Map<String,Action> actions;
+  
   public AbstractChainedSignal() {
     this(null);
   }
@@ -21,6 +23,7 @@ public abstract class AbstractChainedSignal implements Signal {
   public AbstractChainedSignal(AbstractChainedSignal chainSignal) {
     this.overriddenMap = new HashMap<Date, Action[]>();
     this.chainSignal = chainSignal;
+    this.actions = new  HashMap<String,Action>();
   }
   
   public abstract Action override(Action a, Date date, double open,
@@ -67,9 +70,11 @@ public abstract class AbstractChainedSignal implements Signal {
     return this.chainedToString()  + (chainSignal != null ? "+=+" + chainSignal.toString() : "");
   }
   
+  
   public Map<String,Action> getCombinedActions(){
-    return null;
-  }
+	    return this.actions;
+ }
+
   
   @Override
   public Map<String,Action> getActions(){

@@ -29,8 +29,10 @@ public class MinPeriod extends AbstractChainedSignal {
 					delayedAction = a;
 				return null;
 			} else if (delayedAction != null) {
+				Action d = delayedAction;
 				delayedAction = null;
-				return delayedAction;
+				this.actions.put("DL-" + d, d);
+				return d;
 			}
 		}
 

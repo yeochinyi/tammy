@@ -2,7 +2,9 @@ package org.moomoocow.tammy.analysis;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,7 +24,6 @@ import org.jfree.chart.annotations.XYPointerAnnotation;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
-import org.jfree.chart.plot.IntervalMarker;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
@@ -32,13 +33,11 @@ import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.time.ohlc.OHLCSeries;
 import org.jfree.data.time.ohlc.OHLCSeriesCollection;
 import org.jfree.ui.ApplicationFrame;
-import org.jfree.ui.Layer;
-import org.jfree.ui.LengthAdjustmentType;
-import org.jfree.ui.RectangleAnchor;
 import org.jfree.ui.RefineryUtilities;
 import org.jfree.ui.TextAnchor;
-import org.moomoocow.tammy.analysis.signal.MinPeriod;
+import org.moomoocow.tammy.analysis.signal.EnhancedProtective;
 import org.moomoocow.tammy.analysis.signal.MACrosser;
+import org.moomoocow.tammy.analysis.signal.MinPeriod;
 import org.moomoocow.tammy.analysis.signal.Protective;
 import org.moomoocow.tammy.analysis.signal.Signal;
 import org.moomoocow.tammy.model.Stock;
@@ -49,6 +48,8 @@ import org.moomoocow.tammy.model.util.Helper;
 public class Grapher extends ApplicationFrame {
 
   private static final long serialVersionUID = 4438595343592513192L;
+  
+  private final static DateFormat df = new SimpleDateFormat("yyyy-mm-dd");
 
   public Grapher(String title) {
     super(title);
@@ -69,7 +70,10 @@ public class Grapher extends ApplicationFrame {
     for (StockHistoricalData h : sim.getSortedDailyData()) {
       Day day = new Day(h.getDate());
       localOHLCSeries.add(day, h.getAccX(Price.OPEN), h.getAccX(Price.HIGH),
-          h.getAccX(Price.LOW), h.getAccX(Price.CLOSE));
+         h.getAccX(Price.LOW), h.getAccX(Price.CLOSE));
+      //localOHLCSeries.add(day, h.getOpen(), h.getHigh(),
+        //      h.getLow(),h.getClose());
+      
       volTimeSeries.add(day, h.getVol().doubleValue());
     }
 
@@ -85,8 +89,8 @@ public class Grapher extends ApplicationFrame {
 
     int graphIndex = 0;
 
-    // localJFreeChart = ChartFactory.createHighLowChart(symbol, "Date",
-    // "Price", localOHLCSeriesCollection, true);
+    //JFreeChart localJFreeChart = ChartFactory.createHighLowChart(super.getTitle(), "Date",
+     //"Price", localOHLCSeriesCollection, true);
     JFreeChart localJFreeChart = ChartFactory.createCandlestickChart(
         super.getTitle(), "Date", "Price", localOHLCSeriesCollection, true);
     XYPlot localXYPlot = (XYPlot) localJFreeChart.getPlot();
@@ -138,8 +142,13 @@ public class Grapher extends ApplicationFrame {
     // localXYBarRenderer.setBarPainter(new StandardXYBarPainter());
     localXYPlot.setRenderer(graphIndex, localXYBarRenderer);
 
-    Date lastBuyDate = null;
+    //Date lastBuyDate = null;
 
+    for (Entry<String, Action> e : strategy.getActions().entrySet()) {
+    	Action a = e.getValue();
+        localXYPlot.addAnnotation(addPointerAnno(e.getKey(),a.getDate(), a.getPrice()));
+	}
+    
     /*
     for (Deal t : sim.get(strategy).getDeals()) {
       if (t.isBuy()) {
@@ -168,9 +177,9 @@ public class Grapher extends ApplicationFrame {
     setContentPane(localChartPanel);
   }
 
-  private XYPointerAnnotation addPointerAnno(Deal t) {
+  private XYPointerAnnotation addPointerAnno(String comments,Date date,double price) {
     XYPointerAnnotation localXYPointerAnnotation = new XYPointerAnnotation(
-        t.toString(), new Day(t.getDate()).getFirstMillisecond(), t.getUnitPrice(),
+    		comments, new Day(date).getFirstMillisecond(), price,
         2.356194490192345D);
     localXYPointerAnnotation.setBaseRadius(10.0D);
     localXYPointerAnnotation.setTipRadius(0.0D);
@@ -180,21 +189,28 @@ public class Grapher extends ApplicationFrame {
   }
 
   @SuppressWarnings("unchecked")
-  public static void main(String[] args) {
+  public static void main(String[] args) throws ParseException {
 
     PersistenceManager pm = Helper.SINGLETON.getPersistenceManager();
     Query q = pm.newQuery(Stock.class, "this.code == '" + args[0] + "'");
     List<Stock> s = (List<Stock>) q.execute();
 
     //int days = 200;
+    
+    Date d = args.length > 1 ? df.parse(args[1]) : null ;
 
-    Simulator sim = new Simulator(s.get(0), null);
-    int[] mas = { 30, 14 };
-
+    Simulator sim = new Simulator(s.get(0), d);
+    int[] mas = { 9, 54 };
+    Signal sig = new MinPeriod(3, new EnhancedProtective(0.18,0.06, new Protective(0.07, false,
+            new MACrosser(mas, true))));
+    
+    //int[] mas = { 10, 53 };
+    //Signal sig = new MinPeriod(7, new EnhancedProtective(0.06,0.02, new Protective(0.05, false,
+      //      new MACrosser(mas, true))));
+    
     Grapher g = new Grapher(args[0]);
 
-    g.draw(sim, new MinPeriod(3, new Protective(0.2, new Protective(0.1, false,
-        new MACrosser(mas, true)))));
+    g.draw(sim,sig);
     g.pack();
     RefineryUtilities.centerFrameOnScreen(g);
     g.setVisible(true);

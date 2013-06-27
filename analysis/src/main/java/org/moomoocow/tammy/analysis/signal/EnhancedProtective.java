@@ -46,7 +46,9 @@ public class EnhancedProtective extends Protective {
         double percentDropFromTop =  MathHelper.divide(top - mid,top);
         if (percentDropFromTop  >= dropPercentAction){
           reset();
-          return new Action(ActionType.TAKEPROFIT,date,mid);
+          Action act = new Action(ActionType.TAKEPROFIT,date,mid);
+          this.actions.put("EPT-" + act, act);
+          return act;
         }
       }      
     }

@@ -47,11 +47,13 @@ public class MACrosser extends AbstractChainedSignal {
   private ActionType lastAction = null;
   
   private Map<String,SortedMap<Date,Double>> displayPoints;
+  
+  
 
   public MACrosser(int[] maPeriods, boolean isSimpleMA) {
     this.maPeriods = maPeriods;
     this.ma = isSimpleMA ? new SimpleMA(maPeriods) : new ExponentialMA(maPeriods);
-    this.displayPoints = new HashMap<String,SortedMap<Date,Double>>();
+    this.displayPoints = new HashMap<String,SortedMap<Date,Double>>();    
     shortestMaPeriod = Integer.MAX_VALUE;
     longestMaPeriod = 0;
     for (Integer i : maPeriods) {
@@ -88,14 +90,16 @@ public class MACrosser extends AbstractChainedSignal {
     
     this.lastAction = type;    
     
-    return new Action(type,date,mid);
+    Action act = new Action(type,date,mid);
+    this.actions.put("MA-" + act.toString(), act);    
+    return act;
   }
 
   @Override
   public Map<String,SortedMap<Date,Double>> getCombinedGraphPoints() {
     return displayPoints;
   }
-  
+    
   @Override
   public String chainedToString(){
     StringBuffer s = new StringBuffer("MAHLStrategy[");
