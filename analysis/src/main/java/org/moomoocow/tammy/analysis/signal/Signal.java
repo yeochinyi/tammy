@@ -11,6 +11,8 @@ public interface Signal {
 
   Action analyze(Date date, double open, double close, double high, double low, double mid, long vol, Accountant tm);
   
+  boolean isTriggeredAtLeast(int times);
+  
   Map<String,SortedMap<Date,Double>> getDisplayPoints();
 
 }

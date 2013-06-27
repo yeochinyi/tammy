@@ -1,11 +1,10 @@
 package org.moomoocow.tammy.analysis.signal;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Date;
 
 import org.moomoocow.tammy.analysis.Accountant;
 import org.moomoocow.tammy.analysis.Deal.Action;
+import org.moomoocow.tammy.analysis.MathHelper;
 
 public class EnhancedProtective extends Protective {
     
@@ -15,8 +14,8 @@ public class EnhancedProtective extends Protective {
   
   
   public static EnhancedProtective getRandom(Signal s){
-    double greaterThan = Math.random() * 0.35 + 0.05;
-    double dropPercentAction = Math.random() * (greaterThan / 2.0);
+    double greaterThan = MathHelper.randomDouble(0.05, 0.3);
+    double dropPercentAction = MathHelper.randomDouble(0.01, greaterThan); 
     return new EnhancedProtective(greaterThan, dropPercentAction, s);
   }
 
@@ -44,7 +43,7 @@ public class EnhancedProtective extends Protective {
       if(top < mid)
         top = mid;
       else{
-        double percentDropFromTop = new BigDecimal(top - mid).divide(new BigDecimal(top),2,RoundingMode.HALF_EVEN).doubleValue();
+        double percentDropFromTop =  MathHelper.divide(top - mid,top);
         if (percentDropFromTop  >= dropPercentAction){
           reset();
           return Action.TAKEPROFIT;
@@ -65,6 +64,8 @@ public class EnhancedProtective extends Protective {
   public String chainedToString() {
     return "EnhancedProtective [dropPercentAction=" + dropPercentAction + "]=>" + super.chainedToString();
   }
+  
+
   
   
 }

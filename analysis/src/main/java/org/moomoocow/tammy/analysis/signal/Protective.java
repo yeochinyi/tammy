@@ -5,17 +5,18 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 import org.moomoocow.tammy.analysis.Accountant;
 import org.moomoocow.tammy.analysis.Deal;
+import org.moomoocow.tammy.analysis.MathHelper;
 import org.moomoocow.tammy.analysis.Deal.Action;
 
 public class Protective extends AbstractChainedSignal {
 
   public static Protective getRandomTakeProfit(Signal s){
-    double greaterThan = Math.random() * 0.25 + 0.05;
+    double greaterThan = MathHelper.randomDouble(0.05, 0.3);       
     return new Protective(greaterThan,s);
   }
   
   public static Protective getRandomStopLoss(Signal s){
-    double greaterThan = Math.random() * 0.07 + 0.03;
+    double greaterThan = MathHelper.randomDouble(0.03, 0.07);
     return new Protective(greaterThan,false,s);
   }
 
@@ -41,8 +42,8 @@ public class Protective extends AbstractChainedSignal {
   public Action override(Action a, Date date, double open, double close,
       double high, double low, double mid, long vol, Accountant tm) {
 
-    if (tm.hasStock()) {
-      double pnl = tm.getPnlSinceLastTransaction(mid);
+    if (tm != null && tm.hasStock()) {
+      double pnl = tm.getRealPnlSinceLastTran(mid);
       double m = isTakeProfit ? 1.0 : -1.0;
       if (greaterThan > 0.0 && (pnl * m) >= greaterThan) {
         return isTakeProfit ? Deal.Action.TAKEPROFIT : Deal.Action.STOPLOSS;
@@ -57,5 +58,6 @@ public class Protective extends AbstractChainedSignal {
     return "ProtectiveSignal [greaterThan=" + greaterThan
         + ", isTakeProfit=" + isTakeProfit + "]=>" + super.chainedToString();
   }
+  
 
 }
