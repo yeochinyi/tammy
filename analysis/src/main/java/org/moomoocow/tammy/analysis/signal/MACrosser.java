@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.moomoocow.tammy.analysis.Accountant;
 import org.moomoocow.tammy.analysis.Action;
 import org.moomoocow.tammy.analysis.Action.ActionType;
+import org.moomoocow.tammy.analysis.MathHelper;
 import org.moomoocow.tammy.analysis.math.ExponentialMA;
 import org.moomoocow.tammy.analysis.math.MA;
 import org.moomoocow.tammy.analysis.math.SimpleMA;
@@ -20,18 +21,16 @@ public class MACrosser extends AbstractChainedSignal {
   
   public static MACrosser getRandomSMA(Signal s){
     int[] i = { 
-        (int) (Math.random() * 11.0 + 3),
-        (int) (Math.random() * 60.0 + 15),
-        
+    		MathHelper.randomInt(3, 14),
+    		MathHelper.randomInt(15, 60),        
     };
     return new MACrosser(i, true);
   }
   
   public static MACrosser getRandomEMA(Signal s){
     int[] i = { 
-        (int) (Math.random() * 11.0 + 3),
-        (int) (Math.random() * 60.0 + 15),
-        
+    		MathHelper.randomInt(3, 14),
+    		MathHelper.randomInt(15, 60),        
     };
     return new MACrosser(i, false);
   }
@@ -48,11 +47,13 @@ public class MACrosser extends AbstractChainedSignal {
   private ActionType lastAction = null;
   
   private Map<String,SortedMap<Date,Double>> displayPoints;
+  
+  
 
   public MACrosser(int[] maPeriods, boolean isSimpleMA) {
     this.maPeriods = maPeriods;
     this.ma = isSimpleMA ? new SimpleMA(maPeriods) : new ExponentialMA(maPeriods);
-    this.displayPoints = new HashMap<String,SortedMap<Date,Double>>();
+    this.displayPoints = new HashMap<String,SortedMap<Date,Double>>();    
     shortestMaPeriod = Integer.MAX_VALUE;
     longestMaPeriod = 0;
     for (Integer i : maPeriods) {
@@ -82,36 +83,30 @@ public class MACrosser extends AbstractChainedSignal {
     if (maShort == null || maLong == null) return null;
     
     if(maShort.equals(maLong)) return null;
-        
-    //Action returnAction = maShort > maLong ? Action.BUY : Action.SELL;
-    
+            
     ActionType type = maShort > maLong ? ActionType.BUY : ActionType.SELL;
     
-    if(type.equals(lastAction)) return null;
+    if(type.equals(lastAction)) return null;   
     
-   //boolean returnNull  = returnAction.equals(lastAction);
+    this.lastAction = type;    
     
-    this.lastAction = type;
-    
-    //if(returnNull){
-    //  return null;
-    //}
-    
-    return new Action(type,date,mid);
+    Action act = new Action(type,date,mid);
+    this.actions.put("MA-" + act.toString(), act);    
+    return act;
   }
 
   @Override
   public Map<String,SortedMap<Date,Double>> getCombinedGraphPoints() {
     return displayPoints;
   }
-  
+    
   @Override
   public String chainedToString(){
     StringBuffer s = new StringBuffer("MAHLStrategy[");
     for (int i : this.maPeriods) {
       s.append(i).append(",");
     }
-    s.append("buyLongOverShort=").append(buyWhenShortOverLong).append("]=>" + super.chainedToString());
+    s.append("buyWhenShortOverLong=").append(buyWhenShortOverLong).append("]=>" + super.chainedToString());
     return  s.toString();
   }
   

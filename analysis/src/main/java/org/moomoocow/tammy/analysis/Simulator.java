@@ -62,6 +62,9 @@ public class Simulator {
   @SuppressWarnings("unchecked")
   public static final void main(String args[]) throws ParseException {
 
+	  System.out.println("TEST123");
+	  
+	  
     PersistenceManager pm = Helper.SINGLETON.getPersistenceManager();
     Query q = pm.newQuery(Stock.class, "this.code == '" + args[0] + "'");
     List<Stock> s = (List<Stock>) q.execute();
@@ -75,7 +78,13 @@ public class Simulator {
     for(int i=0; i < 2000; i++){
     //int i = 0;
     //while(sim.accountantMap.size() < 2){
-      sim.execute(new BuyAtFirst(EnhancedProtective.getRandom(Protective.getRandomStopLoss(MACrosser.getRandomEMA(null)))));
+
+    	//int[] mas = { 13, 39 };
+    	//int[] mas = { 4, 69 };
+        //sim.execute(new BuyAtFirst(new EnhancedProtective(0.22, 0.1,new Protective(0.04,false,new MACrosser(mas, true)))));
+    //sim.execute(new BuyAtFirst(new MinPeriod(12,new EnhancedProtective(0.09, 0.04,new Protective(0.03,false,new MACrosser(mas, true))))));
+      sim.execute(new BuyAtFirst(MinPeriod.getRandom(EnhancedProtective.getRandom(Protective.getRandomStopLoss(MACrosser.getRandomEMA(null))))));
+      //sim.execute(new BuyAtFirst(EnhancedProtective.getRandom(Protective.getRandomStopLoss(MACrosser.getRandomEMA(null)))));
       i++;
       if(i % 1000 == 0) System.out.println("Counting " + i);
     }
@@ -117,13 +126,14 @@ public class Simulator {
       }
     }*/
     
-
+System.out.println("Finished execute");
     
     for (Entry<Double, List<Signal>> e : sim.pnlMap.entrySet()) {
       System.out.println(e.getKey() + "-->");
       for (Signal st : e.getValue()) {
+    	  MtmManager mtmManager = sim.mtmMap.get(st);
         System.out.println("  " + st.toString() + "->"
-            + sim.mtmMap.get(st));
+            + mtmManager);
       }
     }
   }
@@ -173,13 +183,16 @@ public class Simulator {
     double high = 0.0;
     double low = 0.0;
 
+    Date currentDate = null;
     int lastMonth = -1;
     
     for (StockHistoricalData h : this.sortedDailyData) {
+    	currentDate = h.getDate();
+    	
       if (firstTrans) {
         firstTrans = false;
-        lastMonth = getMonth(h.getDate());
-        mm = new MtmManager(10000.0, h.getDate());
+        lastMonth = getMonth(currentDate);
+        mm = new MtmManager(10000.0, currentDate);
         continue;
       }
 
@@ -190,35 +203,36 @@ public class Simulator {
       low = h.getAccX(LOW);
       
       if (r != null){
-        Deal d = accountant.transact(mid, h.getDate(), r);
+        Deal d = accountant.transact(mid, currentDate, r);
         if(d != null)
           mm.add(d);
       }
 
-      int currentMonth = getMonth(h.getDate());
+      int currentMonth = getMonth(currentDate);
       if(currentMonth != lastMonth){
-        mm.commitMarkToMarket(h.getDate(), mid);
+        mm.commitMarkToMarket(currentDate, mid);
         lastMonth = currentMonth;
       }
       
       r = signal.analyze(h.getDate(),open,close,high,low,mid,h.getVol(), accountant);
     }
 
+    mm.commitMarkToMarket(currentDate, mid);
     Double pnl = mm.getTotalAnnualizedPnl();
     
     if((this.benchmark == null || pnl > this.benchmark)){
 
-      if(signal.isTriggeredAtLeast(1)){}
-      
-      this.accountantMap.put(signal, accountant);
-      this.mtmMap.put(signal, mm); 
-      
-      List<Signal> s = pnlMap.get(pnl);
-      if (s == null) {
-        s = new ArrayList<Signal>();
-        pnlMap.put(pnl, s);
-      }
-      s.add(signal);
+      if(signal.isTriggeredAtLeast(1)){
+          this.accountantMap.put(signal, accountant);
+          this.mtmMap.put(signal, mm); 
+          
+          List<Signal> s = pnlMap.get(pnl);
+          if (s == null) {
+            s = new ArrayList<Signal>();
+            pnlMap.put(pnl, s);
+          }
+          s.add(signal);    	  
+      }      
     }
     return mm;
   }

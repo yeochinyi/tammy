@@ -10,10 +10,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.moomoocow.tammy.analysis.Accountant;
 import org.moomoocow.tammy.analysis.Action;
-import org.moomoocow.tammy.analysis.signal.EnhancedProtective;
+import org.moomoocow.tammy.analysis.Action.ActionType;
 import org.moomoocow.tammy.analysis.signal.MACrosser;
 import org.moomoocow.tammy.analysis.signal.MinPeriod;
-import org.moomoocow.tammy.analysis.signal.Protective;
 import org.moomoocow.tammy.analysis.signal.Signal;
 
 public class TestSignals {
@@ -74,8 +73,9 @@ public class TestSignals {
     Signal s = new MinPeriod(3,new MACrosser(mas,true));
     assertEquals(null,s.analyze(new GregorianCalendar(2013,0,dateCount++).getTime(),0.0,0.0,0.0,0.0,1.0,0,a));
     Date d = new GregorianCalendar(2013,0,dateCount++).getTime();
-    assertEquals(Action.BUY,s.analyze(d,0.0,0.0,0.0,0.0,2.0,0,a));
-    a.transact(2.0, d, Action.BUY);
+    Action action = s.analyze(d,0.0,0.0,0.0,0.0,2.0,0,a);
+    assertEquals(true,action.isBuy());
+    a.transact(2.0, d, action);
     assertEquals(null,s.analyze(new GregorianCalendar(2013,0,dateCount++).getTime(),0.0,0.0,0.0,0.0,1.0,0,a));
     assertEquals(true,s.isTriggeredAtLeast(1));
   }

@@ -7,44 +7,42 @@ import org.moomoocow.tammy.analysis.Action;
 
 public class MinPeriod extends AbstractChainedSignal {
 
-  private final int minPeriod;
-  
-  private Action delayedAction;
-  
-  public static MinPeriod getRandom(AbstractChainedSignal s){
-    return new MinPeriod((int) (Math.random() * 14.0), s);
-  }
+	private final int minPeriod;
+	private Action delayedAction;
 
-  public MinPeriod(int minPeriod, AbstractChainedSignal signal) {
-    super(signal);
-    this.minPeriod = minPeriod;
-  }
+	public static MinPeriod getRandom(AbstractChainedSignal s) {
+		return new MinPeriod((int) (Math.random() * 14.0), s);
+	}
 
-  @Override
-  public Action override(Action a, Date date, double open, double close, double high,
-      double low, double mid, long vol, Accountant tm) {   
-    if(minPeriod > 0 && tm != null){
-      Integer period = tm.getPeriodAfterLastDealExclWeekends(date);
-      if(period != null && period <= minPeriod){
-        if(a != null) delayedAction = a;
-        return null;
-      }
-      else if(delayedAction != null){
-        delayedAction = null;
-        return delayedAction;
-      }
-    }
-    
-    return a;
-  }
+	public MinPeriod(int minPeriod, AbstractChainedSignal signal) {
+		super(signal);
+		this.minPeriod = minPeriod;
+	}
 
-  @Override
-  public String chainedToString() {
-    return "MinPeriod [minPeriod=" + minPeriod
-        + "]=>" + super.chainedToString();
-  }
-  
-  
+	@Override
+	public Action override(Action a, Date date, double open, double close,
+			double high, double low, double mid, long vol, Accountant tm) {
+		if (minPeriod > 0 && tm != null) {
+			Integer period = tm.getPeriodAfterLastDealExclWeekends(date);
+			if (period != null && period <= minPeriod) {
+				if (a != null)
+					delayedAction = a;
+				return null;
+			} else if (delayedAction != null) {
+				Action d = delayedAction;
+				delayedAction = null;
+				this.actions.put("DL-" + d, d);
+				return d;
+			}
+		}
 
+		return a;
+	}
+
+	@Override
+	public String chainedToString() {
+		return "MinPeriod [minPeriod=" + minPeriod + "]=>"
+				+ super.chainedToString();
+	}
 
 }
