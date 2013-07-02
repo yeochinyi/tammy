@@ -83,8 +83,8 @@ public class MtmManager {
 			if (currentCost != 0.0) {
 				double numerator = currentSale + fakeSell - currentCost;
 				irr = MathHelper.divide(numerator, currentCost);
-				irrAnnual = MathHelper.divide(numerator * 365.0, currentCost
-						* days);
+                                double denomintor = currentCost * days;
+				irrAnnual = MathHelper.divide(numerator * 365.0, denomintor);
 			}
 		}
 		MarkToMarket m = new MarkToMarket(endDate, price, this.currentDeals,

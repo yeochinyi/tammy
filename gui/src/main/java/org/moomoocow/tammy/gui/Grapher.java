@@ -1,10 +1,7 @@
-package org.moomoocow.tammy.analysis;
+package org.moomoocow.tammy.gui;
 
 import java.awt.Color;
-import java.awt.Dimension;
-import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,8 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedMap;
 
-import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
+import javax.swing.JPanel;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -32,30 +28,29 @@ import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.time.ohlc.OHLCSeries;
 import org.jfree.data.time.ohlc.OHLCSeriesCollection;
-import org.jfree.ui.ApplicationFrame;
-import org.jfree.ui.RefineryUtilities;
 import org.jfree.ui.TextAnchor;
-import org.moomoocow.tammy.analysis.signal.EnhancedProtective;
-import org.moomoocow.tammy.analysis.signal.MACrosser;
-import org.moomoocow.tammy.analysis.signal.MinPeriod;
-import org.moomoocow.tammy.analysis.signal.Protective;
+import org.moomoocow.tammy.analysis.Action;
+import org.moomoocow.tammy.analysis.Simulator;
 import org.moomoocow.tammy.analysis.signal.Signal;
-import org.moomoocow.tammy.model.Stock;
 import org.moomoocow.tammy.model.StockHistoricalData;
 import org.moomoocow.tammy.model.StockHistoricalData.Price;
-import org.moomoocow.tammy.model.util.Helper;
 
-public class Grapher extends ApplicationFrame {
+public class Grapher extends JPanel {
 
   private static final long serialVersionUID = 4438595343592513192L;
   
-  private final static DateFormat df = new SimpleDateFormat("yyyy-mm-dd");
+  //private final static DateFormat df = new SimpleDateFormat("yyyy-mm-dd");
+  
+  private String title;
 
   public Grapher(String title) {
-    super(title);
+      super();
+      this.title = title;    
   }
 
-  private void draw(Simulator sim, Signal strategy) {
+  public void draw(Simulator sim, Signal strategy) {
+      
+      this.removeAll();
 
     OHLCSeriesCollection localOHLCSeriesCollection = new OHLCSeriesCollection();
     TimeSeries volTimeSeries;
@@ -92,7 +87,7 @@ public class Grapher extends ApplicationFrame {
     //JFreeChart localJFreeChart = ChartFactory.createHighLowChart(super.getTitle(), "Date",
      //"Price", localOHLCSeriesCollection, true);
     JFreeChart localJFreeChart = ChartFactory.createCandlestickChart(
-        super.getTitle(), "Date", "Price", localOHLCSeriesCollection, true);
+        title, "Date", "Price", localOHLCSeriesCollection, true);
     XYPlot localXYPlot = (XYPlot) localJFreeChart.getPlot();
 
     // Domain Axis
@@ -173,8 +168,9 @@ public class Grapher extends ApplicationFrame {
     ChartPanel localChartPanel = new ChartPanel(localJFreeChart);
     localChartPanel.setMouseWheelEnabled(true);
 
-    localChartPanel.setPreferredSize(new Dimension(500, 270));
-    setContentPane(localChartPanel);
+    //localChartPanel.setPreferredSize(new Dimension(500, 270));
+    //setContentPane(localChartPanel);
+    this.add(localChartPanel);
   }
 
   private XYPointerAnnotation addPointerAnno(String comments,Date date,double price) {
@@ -186,33 +182,5 @@ public class Grapher extends ApplicationFrame {
     localXYPointerAnnotation.setPaint(Color.blue);
     localXYPointerAnnotation.setTextAnchor(TextAnchor.HALF_ASCENT_RIGHT);
     return localXYPointerAnnotation;
-  }
-
-  @SuppressWarnings("unchecked")
-  public static void main(String[] args) throws ParseException {
-
-    PersistenceManager pm = Helper.SINGLETON.getPersistenceManager();
-    Query q = pm.newQuery(Stock.class, "this.code == '" + args[0] + "'");
-    List<Stock> s = (List<Stock>) q.execute();
-
-    //int days = 200;
-    
-    Date d = args.length > 1 ? df.parse(args[1]) : null ;
-
-    Simulator sim = new Simulator(s.get(0), d);
-    int[] mas = { 9, 54 };
-    Signal sig = new MinPeriod(3, new EnhancedProtective(0.18,0.06, new Protective(0.07, false,
-            new MACrosser(mas, true))));
-    
-    //int[] mas = { 10, 53 };
-    //Signal sig = new MinPeriod(7, new EnhancedProtective(0.06,0.02, new Protective(0.05, false,
-      //      new MACrosser(mas, true))));
-    
-    Grapher g = new Grapher(args[0]);
-
-    g.draw(sim,sig);
-    g.pack();
-    RefineryUtilities.centerFrameOnScreen(g);
-    g.setVisible(true);
   }
 }

@@ -169,16 +169,16 @@ public class StockHistoricalData extends BasePersistData implements Comparable<S
     Double price = null;
     switch(p){
     case CLOSE:
-      price = open;
+      price = close;
       break;
     case HIGH:
-      price = open;
+      price = high;
       break;
     case LOW:
-      price = open;
+      price = low;
       break;
     case MID:
-      price = open;
+      price = getMid();
       break;
     case OPEN:
       price = open;

@@ -66,10 +66,11 @@ public class Simulator {
 	  
 	  
     PersistenceManager pm = Helper.SINGLETON.getPersistenceManager();
-    Query q = pm.newQuery(Stock.class, "this.code == '" + args[0] + "'");
+    Query q = pm.newQuery(Stock.class, "this.code == '" + "FAS" + "'");
     List<Stock> s = (List<Stock>) q.execute();
 
-    Date d = args.length > 1 ? df.parse(args[1]) : null ;
+    //Date d = args.length > 1 ? df.parse(args[1]) : null ;
+    Date d = df.parse("2010-01-01");
     
     Simulator sim = new Simulator(s.get(0), d);
     
@@ -185,6 +186,7 @@ System.out.println("Finished execute");
 
     Date currentDate = null;
     int lastMonth = -1;
+    boolean hasFinalMtmCommit = true;
     
     for (StockHistoricalData h : this.sortedDailyData) {
     	currentDate = h.getDate();
@@ -208,16 +210,21 @@ System.out.println("Finished execute");
           mm.add(d);
       }
 
+      r = signal.analyze(h.getDate(),open,close,high,low,mid,h.getVol(), accountant);
+      
       int currentMonth = getMonth(currentDate);
       if(currentMonth != lastMonth){
         mm.commitMarkToMarket(currentDate, mid);
         lastMonth = currentMonth;
+        hasFinalMtmCommit = false;
       }
-      
-      r = signal.analyze(h.getDate(),open,close,high,low,mid,h.getVol(), accountant);
+      else{
+        hasFinalMtmCommit = true;
+      }
     }
 
-    mm.commitMarkToMarket(currentDate, mid);
+    if(hasFinalMtmCommit)
+        mm.commitMarkToMarket(currentDate, mid);
     Double pnl = mm.getTotalAnnualizedPnl();
     
     if((this.benchmark == null || pnl > this.benchmark)){

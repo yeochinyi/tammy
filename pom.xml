@@ -12,6 +12,7 @@
 		<module>model</module>
 		<module>marketdata</module>
 		<module>analysis</module>
+                <module>gui</module>
 	</modules>
 
 	<profiles>
