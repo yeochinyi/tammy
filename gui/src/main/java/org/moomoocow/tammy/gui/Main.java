@@ -5,13 +5,16 @@
 package org.moomoocow.tammy.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.swing.JPanel;
 import org.moomoocow.tammy.analysis.Simulator;
+import org.moomoocow.tammy.analysis.signal.BuyAtFirst;
 import org.moomoocow.tammy.analysis.signal.EnhancedProtective;
 import org.moomoocow.tammy.analysis.signal.MACrosser;
 import org.moomoocow.tammy.analysis.signal.MinPeriod;
@@ -34,8 +37,9 @@ public class Main extends javax.swing.JFrame {
      */
     public Main() {
         initComponents();        
-        g = new Grapher("TEST");               
-        getContentPane().add(g,BorderLayout.CENTER);
+        g = new Grapher("TEST"); 
+        
+        //this.jPanel2.add(g,BorderLayout.CENTER);
         
     }
     
@@ -56,11 +60,15 @@ public class Main extends javax.swing.JFrame {
 
         Simulator sim = new Simulator(s.get(0), dateFrom);
         int[] mas = { 9, 54 };
-        Signal sig = new MinPeriod(3, new EnhancedProtective(0.18,0.06, new Protective(0.07, false,
-                new MACrosser(mas, true))));
-        g.draw(sim,sig);        
-        g.invalidate();
+        Signal sig = new BuyAtFirst(new MinPeriod(3, new EnhancedProtective(0.18,0.06, new Protective(0.07, false,
+                new MACrosser(mas, true)))));
+        JPanel panel = g.draw(sim,sig);        
+        panel.setPreferredSize(new Dimension(2000,300));
+        this.jPanel2.add(panel,BorderLayout.CENTER);
+        //g.invalidate();
         pack();
+        
+        
     }
 
     /**
@@ -78,6 +86,8 @@ public class Main extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         dateFromTf = new javax.swing.JTextField();
         plotButton = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jPanel2 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new java.awt.BorderLayout());
@@ -136,6 +146,19 @@ public class Main extends javax.swing.JFrame {
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.NORTH);
 
+        jScrollPane1.setPreferredSize(new java.awt.Dimension(800, 277));
+
+        jPanel2.setPreferredSize(new java.awt.Dimension(800, 273));
+        jPanel2.addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                jPanel2ComponentResized(evt);
+            }
+        });
+        jPanel2.setLayout(new java.awt.BorderLayout());
+        jScrollPane1.setViewportView(jPanel2);
+
+        getContentPane().add(jScrollPane1, java.awt.BorderLayout.CENTER);
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
@@ -150,6 +173,10 @@ public class Main extends javax.swing.JFrame {
     private void dateFromTfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dateFromTfActionPerformed
         plot();
     }//GEN-LAST:event_dateFromTfActionPerformed
+
+    private void jPanel2ComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jPanel2ComponentResized
+        //plot();
+    }//GEN-LAST:event_jPanel2ComponentResized
 
     /**
      * @param args the command line arguments
@@ -190,6 +217,8 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton plotButton;
     private javax.swing.JTextField symbolTf;
     // End of variables declaration//GEN-END:variables

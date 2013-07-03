@@ -66,11 +66,12 @@ public class Simulator {
 	  
 	  
     PersistenceManager pm = Helper.SINGLETON.getPersistenceManager();
-    Query q = pm.newQuery(Stock.class, "this.code == '" + "FAS" + "'");
+    Query q = pm.newQuery(Stock.class, "this.code == '" + "ERX" + "'");
     List<Stock> s = (List<Stock>) q.execute();
 
     //Date d = args.length > 1 ? df.parse(args[1]) : null ;
-    Date d = df.parse("2010-01-01");
+    //Date d = df.parse("2010-01-01");
+    Date d = null;
     
     Simulator sim = new Simulator(s.get(0), d);
     
@@ -86,7 +87,6 @@ public class Simulator {
     //sim.execute(new BuyAtFirst(new MinPeriod(12,new EnhancedProtective(0.09, 0.04,new Protective(0.03,false,new MACrosser(mas, true))))));
       sim.execute(new BuyAtFirst(MinPeriod.getRandom(EnhancedProtective.getRandom(Protective.getRandomStopLoss(MACrosser.getRandomEMA(null))))));
       //sim.execute(new BuyAtFirst(EnhancedProtective.getRandom(Protective.getRandomStopLoss(MACrosser.getRandomEMA(null)))));
-      i++;
       if(i % 1000 == 0) System.out.println("Counting " + i);
     }
     
@@ -229,7 +229,7 @@ System.out.println("Finished execute");
     
     if((this.benchmark == null || pnl > this.benchmark)){
 
-      if(signal.isTriggeredAtLeast(1)){
+      //if(signal.isTriggeredAtLeast(1)){
           this.accountantMap.put(signal, accountant);
           this.mtmMap.put(signal, mm); 
           
@@ -239,7 +239,7 @@ System.out.println("Finished execute");
             pnlMap.put(pnl, s);
           }
           s.add(signal);    	  
-      }      
+      //}      
     }
     return mm;
   }

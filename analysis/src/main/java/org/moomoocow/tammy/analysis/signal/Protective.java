@@ -48,7 +48,7 @@ public class Protective extends AbstractChainedSignal {
       double m = isTakeProfit ? 1.0 : -1.0;
       if (greaterThan > 0.0 && (pnl * m) >= greaterThan) {
     	Action act = new Action(isTakeProfit ?  ActionType.TAKEPROFIT : ActionType.STOPLOSS, date, mid);
-    	//this.actions.put("PT-" + act, act);
+    	this.actions.put("P-" + act, act);
         return  act;
       }
     }

@@ -6,7 +6,7 @@ import java.util.Date;
 
 public class Action {
 
-	private final static DateFormat df = new SimpleDateFormat("dd/MM");
+	private final static DateFormat df = new SimpleDateFormat("d/M");
 	
 	private final ActionType type;
 
@@ -22,12 +22,17 @@ public class Action {
 	}
 
 	public enum ActionType {
-		BUY(true), SELL(false), STOPLOSS(false), TAKEPROFIT(false);
+		BUY(true,"B"), 
+                SELL(false,"S"), 
+                STOPLOSS(false,"L"), 
+                TAKEPROFIT(false,"T");
 
 		boolean isBuy;
+                String code;
 
-		ActionType(boolean isBuy) {
+		ActionType(boolean isBuy,String code) {
 			this.isBuy = isBuy;
+                        this.code = code;
 		}
 	}
 
@@ -43,9 +48,13 @@ public class Action {
 		return price;
 	}
 
+	public ActionType getType() {
+		return type;
+	}
+        
 	@Override
 	public String toString() {
-		return type + "@" + String.format("%(,.2f",price) + " on " + df.format(date);				
+		return type.code + "@" + String.format("%(,.2f",price) + "_" + df.format(date);				
 	}
 	
 	

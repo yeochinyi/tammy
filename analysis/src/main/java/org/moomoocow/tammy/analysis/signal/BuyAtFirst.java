@@ -19,7 +19,9 @@ public class BuyAtFirst extends AbstractChainedSignal {
       double high, double low, double mid, long vol, Accountant tm) {
     if (!bought) {
       bought = true;
-      return new Action(ActionType.BUY,date, mid);
+      Action act = new Action(ActionType.BUY,date, mid);
+      this.actions.put("1-" + act.toString(), act);
+      return act;
     }
     return a;
   }

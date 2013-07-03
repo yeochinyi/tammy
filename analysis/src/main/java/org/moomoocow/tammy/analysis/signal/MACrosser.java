@@ -91,7 +91,7 @@ public class MACrosser extends AbstractChainedSignal {
     this.lastAction = type;    
     
     Action act = new Action(type,date,mid);
-    this.actions.put("MA-" + act.toString(), act);    
+    this.actions.put("X-" + act.toString(), act);    
     return act;
   }
 
