@@ -66,7 +66,7 @@ public class Simulator {
 	  
 	  
     PersistenceManager pm = Helper.SINGLETON.getPersistenceManager();
-    Query q = pm.newQuery(Stock.class, "this.code == '" + "ERX" + "'");
+    Query q = pm.newQuery(Stock.class, "this.code == '" + "URE" + "'");
     List<Stock> s = (List<Stock>) q.execute();
 
     //Date d = args.length > 1 ? df.parse(args[1]) : null ;
@@ -229,7 +229,7 @@ System.out.println("Finished execute");
     
     if((this.benchmark == null || pnl > this.benchmark)){
 
-      //if(signal.isTriggeredAtLeast(1)){
+      if(signal.isTriggeredAtLeast(1)){
           this.accountantMap.put(signal, accountant);
           this.mtmMap.put(signal, mm); 
           
@@ -239,7 +239,7 @@ System.out.println("Finished execute");
             pnlMap.put(pnl, s);
           }
           s.add(signal);    	  
-      //}      
+      }
     }
     return mm;
   }
