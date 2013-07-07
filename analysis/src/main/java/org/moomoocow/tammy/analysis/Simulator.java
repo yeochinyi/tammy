@@ -51,9 +51,17 @@ public class Simulator {
 
   private Map<Signal, Accountant> accountantMap;
 
-  private Map<Double, List<Signal>> pnlMap;
-  
-  private Map<Signal, MtmManager> mtmMap;
+    public Map<Double, List<Signal>> getPnlMap() {
+        return pnlMap;
+    }
+
+    private Map<Double, List<Signal>> pnlMap;
+
+    public Map<Signal, MtmManager> getMtmMap() {
+        return mtmMap;
+    }
+
+    private Map<Signal, MtmManager> mtmMap;
   
   private final Stock stock;
   
@@ -227,7 +235,7 @@ System.out.println("Finished execute");
         mm.commitMarkToMarket(currentDate, mid);
     Double pnl = mm.getTotalAnnualizedPnl();
     
-    if((this.benchmark == null || pnl > this.benchmark)){
+    if(this.benchmark == null || (pnl > this.benchmark && pnl > 0.0)){
 
       if(signal.isTriggeredAtLeast(1)){
           this.accountantMap.put(signal, accountant);
