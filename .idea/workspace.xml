@@ -2,16 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="03fc566c-cd9d-43a5-b1f2-03e1f18e22e3" name="Default" comment="">
-      <change type="DELETED" beforePath="C:\workspace\tammy\gui\src\main\java\org\moomoocow\tammy\gui\Main.form" afterPath="" />
-      <change type="DELETED" beforePath="C:\workspace\tammy\gui\src\main\java\org\moomoocow\tammy\gui\Main.java" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gui/src/main/java/org/moomoocow/tammy/gui/MainIntellij.form" afterPath="$PROJECT_DIR$/gui/src/main/java/org/moomoocow/tammy/gui/MainIntellij.form" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gui/src/main/java/org/moomoocow/tammy/gui/MainIntellij.java" afterPath="$PROJECT_DIR$/gui/src/main/java/org/moomoocow/tammy/gui/MainIntellij.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/analysis/src/main/java/org/moomoocow/tammy/analysis/Simulator.java" afterPath="$PROJECT_DIR$/analysis/src/main/java/org/moomoocow/tammy/analysis/Simulator.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="tammy-root.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/Dummy.txt" changelist="03fc566c-cd9d-43a5-b1f2-03e1f18e22e3" time="1373179244761" ignored="false" />
+    <file path="/Dummy.txt" changelist="03fc566c-cd9d-43a5-b1f2-03e1f18e22e3" time="1373376186515" ignored="false" />
     <file path="/a.java" changelist="03fc566c-cd9d-43a5-b1f2-03e1f18e22e3" time="1372950193061" ignored="false" />
     <file path="/sample.java" changelist="03fc566c-cd9d-43a5-b1f2-03e1f18e22e3" time="1372950192530" ignored="false" />
     <file path="/fragment.java" changelist="03fc566c-cd9d-43a5-b1f2-03e1f18e22e3" time="1373046273761" ignored="false" />
@@ -42,7 +37,6 @@
     <disable_hints />
   </component>
   <component name="DebuggerManager">
-    <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
     <breakpoint_any default_suspend_policy="SuspendAll" default_condition_enabled="true">
       <breakpoint>
         <option name="NOTIFY_CAUGHT" value="true" />
@@ -79,7 +73,7 @@
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
     </breakpoint_any>
-    <line_breakpoints>
+    <line_breakpoints default_suspend_policy="SuspendAll" default_condition_enabled="true">
       <breakpoint url="file://$PROJECT_DIR$/gui/src/main/java/org/moomoocow/tammy/gui/MainIntellij.java" line="62" class="org.moomoocow.tammy.gui.MainIntellij$2" package="org.moomoocow.tammy.gui">
         <option name="ENABLED" value="true" />
         <option name="LOG_ENABLED" value="false" />
@@ -96,6 +90,7 @@
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
     </line_breakpoints>
+    <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
     <breakpoint_rules />
     <ui_properties />
   </component>
@@ -108,12 +103,17 @@
       <file leaf-file-name="Simulator.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/analysis/src/main/java/org/moomoocow/tammy/analysis/Simulator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="237" column="7" selection-start="7421" selection-end="7421" vertical-scroll-proportion="0.53457946">
-              <folding>
-                <element signature="e#2074#2104#0" expanded="true" />
-                <element signature="e#5242#5385#0" expanded="true" />
-                <element signature="e#5378#5379#0" expanded="true" />
-              </folding>
+            <state line="244" column="44" selection-start="7701" selection-end="7701" vertical-scroll-proportion="0.4969475">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="pom.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/gui/pom.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="33" column="61" selection-start="926" selection-end="926" vertical-scroll-proportion="0.0">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -122,10 +122,7 @@
         <entry file="file://$PROJECT_DIR$/gui/src/main/java/org/moomoocow/tammy/gui/MainIntellij.java">
           <provider selected="true" editor-type-id="text-editor">
             <state line="69" column="131" selection-start="2443" selection-end="2443" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="e#1756#2485#0" expanded="true" />
-                <element signature="e#2474#2475#0" expanded="true" />
-              </folding>
+              <folding />
             </state>
           </provider>
         </entry>
@@ -356,7 +353,7 @@
     <option name="STATE" value="0" />
   </component>
   <component name="ProjectView">
-    <navigator currentView="ProjectPane" proportions="" version="1" splitterProportion="0.5">
+    <navigator currentView="Scope" currentSubView="Project Files" proportions="" version="1" splitterProportion="0.5">
       <flattenPackages />
       <showMembers />
       <showModules />
@@ -368,6 +365,30 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Scope">
+        <subPane subId="Project Files">
+          <PATH>
+            <PATH_ELEMENT USER_OBJECT="Root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="tammy-root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="tammy">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT USER_OBJECT="Root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -741,7 +762,6 @@
         </subPane>
       </pane>
       <pane id="PackagesPane" />
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -998,19 +1018,17 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-4" y="-4" width="1288" height="1002" extended-state="0" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.17909238" sideWeight="0.6705608" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.22123177" sideWeight="0.6705608" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32943925" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3995327" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32943925" sideWeight="0.5" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32943925" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24959481" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298217" sideWeight="0.6705608" order="4" side_tool="false" content_ui="tabs" />
@@ -1019,6 +1037,8 @@
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32943925" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32943925" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32943925" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
     </layout>
@@ -1088,13 +1108,36 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/analysis/src/main/java/org/moomoocow/tammy/analysis/Simulator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gui/src/main/java/org/moomoocow/tammy/gui/MainIntellij.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="69" column="131" selection-start="2443" selection-end="2443" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gui/src/main/java/org/moomoocow/tammy/gui/Grapher.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="163" column="51" selection-start="6908" selection-end="6918" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gui/src/main/java/org/moomoocow/tammy/gui/MainIntellij.form">
+      <provider selected="true" editor-type-id="ui-designer">
+        <state />
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/gui/src/main/java/org/moomoocow/tammy/gui/MainIntellij.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="61" column="0" selection-start="1614" selection-end="1614" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="e#1756#2485#0" expanded="true" />
-            <element signature="e#2474#2475#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1113,22 +1156,14 @@
     <entry file="file://$PROJECT_DIR$/analysis/src/main/java/org/moomoocow/tammy/analysis/Simulator.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="e#2074#2104#0" expanded="true" />
-            <element signature="e#5242#5385#0" expanded="true" />
-            <element signature="e#5378#5379#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/analysis/src/main/java/org/moomoocow/tammy/analysis/Simulator.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="e#2074#2104#0" expanded="true" />
-            <element signature="e#5242#5385#0" expanded="true" />
-            <element signature="e#5378#5379#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1157,21 +1192,21 @@
     <entry file="file://$PROJECT_DIR$/gui/src/main/java/org/moomoocow/tammy/gui/MainIntellij.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="69" column="131" selection-start="2443" selection-end="2443" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="e#1756#2485#0" expanded="true" />
-            <element signature="e#2474#2475#0" expanded="true" />
-          </folding>
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gui/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="33" column="61" selection-start="926" selection-end="926" vertical-scroll-proportion="0.0">
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/analysis/src/main/java/org/moomoocow/tammy/analysis/Simulator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="237" column="7" selection-start="7421" selection-end="7421" vertical-scroll-proportion="0.53457946">
-          <folding>
-            <element signature="e#2074#2104#0" expanded="true" />
-            <element signature="e#5242#5385#0" expanded="true" />
-            <element signature="e#5378#5379#0" expanded="true" />
-          </folding>
+        <state line="244" column="44" selection-start="7701" selection-end="7701" vertical-scroll-proportion="0.4969475">
+          <folding />
         </state>
       </provider>
     </entry>
